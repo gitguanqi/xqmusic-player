@@ -61,7 +61,7 @@ new XqMusic(options);
 
 ### preview
 
-![xqlight](./docs/img/preview.jpg)
+![xqlight](https://xqgj.cc/xqmusic-player/img/preview.jpg)
 
 ## issue
 
