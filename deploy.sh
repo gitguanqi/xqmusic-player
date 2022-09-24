@@ -10,6 +10,6 @@ set -e
 git add -A
 read -p "Please input this version commits: " -t 30 commits
 git commit -m "${commits}"
-git push origin master -f
+git push origin main -f
 
 exit 0
