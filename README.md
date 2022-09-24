@@ -65,7 +65,7 @@ new XqMusic(options);
 
 ## issue
 
-[submit your question](https://github.com/gitguanqi/xqi18n/issues/new)
+[submit your question](https://github.com/gitguanqi/xqmusic-player/issues/new)
 
 ## author
 
