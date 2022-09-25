@@ -7,9 +7,7 @@ version: 0.0.1
 function XqMusic (options = {
     el: 'body',
     list: [],
-    move: false,
-    slide: false,
-    slideBottom: 0,
+    mode: 'slide',
 }) {
     this.options = options;
     if (!options.el) {
@@ -36,7 +34,7 @@ function XqMusic (options = {
     }
     
     // 是否移动
-    if (this.options.move) {
+    if (this.options.mode == 'move') {
         this.elem.firstChild.classList.add('move');
         this.boxDrag();
     }
@@ -54,8 +52,7 @@ XqMusic.prototype.initPage = function () {
     let elem = this.elem;
     if (elem && elem.innerText === '') {
         let xqMusicElem = document.createElement('div');
-        xqMusicElem.className = this.options.slide ? 'xqmusic slide' : 'xqmusic';
-        xqMusicElem.style.bottom = this.options.slideBottom || this.options.slideBottom === 0 ? this.options.slideBottom === 0 ? 0 : this.options.slideBottom + 'px' : 25 + 'px';
+        xqMusicElem.className = this.options.mode == 'slide' ? 'xqmusic slide' : 'xqmusic';
         xqMusicElem.innerHTML = `<div class="xqmusic-top active">
                 <ul class="xqmusic-menu-ls scroll-box"></ul>
                 <ul class="xqmusic-lyric-ls scroll-box">

@@ -3,7 +3,10 @@ author: gitguanqi,
 date: 2022-09-24,
 version: 0.0.1
 */
-
+body {
+    margin: 0;
+    padding: 0;
+}
 ul,li {
     margin: 0;
     padding: 0;
@@ -53,20 +56,23 @@ button {
 }
 
 .xqmusic {
-    position: absolute;
-    right: 5px;
     max-width: 318px;
     width: 100%;
 }
 
 .xqmusic.slide {
     position: fixed;
+    bottom: 25px;
     right: -252px;
     transition: all .5s;
 }
 
 .xqmusic.slide:hover {
     right: 0;
+}
+
+.xqmusic.move {
+    position: absolute;
 }
 
 .xqmusic.move:hover {

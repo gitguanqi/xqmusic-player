@@ -52,9 +52,7 @@ let songs = [
 let options = {
     el: '#music',
     list: songs,
-    move: false,
-    slide: true,
-    slideBottom: 50,
+    mode: 'slide', // move/slide
 }
 
 new XqMusic(options);
