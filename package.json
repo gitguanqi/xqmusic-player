@@ -1,0 +1,24 @@
+{
+  "name": "xqmusic-player",
+  "version": "1.0.0",
+  "description": "This is a simplify music player.",
+  "main": "./libs/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "demo": "node test/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gitguanqi/xqmusic-player.git"
+  },
+  "keywords": [
+    "player",
+    "xqmusic-player"
+  ],
+  "author": "gitguanqi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gitguanqi/xqmusic-player/issues"
+  },
+  "homepage": "https://github.com/gitguanqi/xqmusic-player#readme"
+}

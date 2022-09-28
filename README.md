@@ -15,6 +15,20 @@ This is a simplify music player.
 <script src="https://xqgj.cc/xqcdn/libs/xqmusic/0.0.1/js/xqmusic.min.js"></script>
 ```
 
+### use npm
+
+```sh
+npm i xqmusic-player
+```
+
+### vue3
+
+```js
+import xqMusic from 'xqmusic-player/libs/vue/xqmusic';
+const app = createApp(App);
+app.use(xqMusic);
+```
+
 ### detail
 
 ```html
