@@ -7,18 +7,87 @@ This is a simplify music player.
 ### import cdn
 
 ```html
-<!-- cdn -->
-<link rel="stylesheet" href="https://xqgj.cc/xqcdn/libs/font-awesome/5.15.3/css/all.min.css">
-<link rel="stylesheet" href="https://xqgj.cc/xqcdn/libs/xqmusic/0.0.1/css/xqmusic.min.css">
-<script src="https://xqgj.cc/xqcdn/libs/gjs/1.0.3/js/gjs.min.js"></script>
-<script src="https://xqgj.cc/xqcdn/libs/axios/0.19.2/axios.min.js"></script>
-<script src="https://xqgj.cc/xqcdn/libs/xqmusic/0.0.1/js/xqmusic.min.js"></script>
+<!-- cdn css -->
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/xqmusic-player/libs/css/xqmusic.min.css">
+<!-- cdn js -->
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.27.2/axios.min.js"></script>
+<script src="https://unpkg.com/xqgjs/libs/gjs.min.js"></script>
+<script src="https://unpkg.com/xqmusic-player@1.0.1/libs/js/xqmusic.min.js"></script>
 ```
 
 ### use npm
 
 ```sh
 npm i xqmusic-player
+```
+
+### mock
+
+`/mock/music.json`:
+
+```json
+[
+    {
+        "id": 1,
+        "name": "麻雀",
+        "author": "李荣浩",
+        "pic": "./lrh-mq.jpg",
+        "lyric_url": "./lrh-mq.lrc",
+        "url": "./lrh-mq.mp3"
+    },
+    {
+        "id": 2,
+        "name": "年少有为",
+        "author": "李荣浩",
+        "pic": "./lrh-nsyw.jpg",
+        "lyric_url": "./lrh-nsyw.lrc",
+        "url": "./lrh-nsyw.mp3"
+    },
+    {
+        "id": 3,
+        "name": "爸爸妈妈",
+        "author": "李荣浩",
+        "pic": "./lrh-bbmm.jpg",
+        "lyric_url": "./lrh-bbmm.lrc",
+        "url": "./lrh-bbmm.mp3"
+    }
+]
+```
+
+### browser
+
+```html
+<div id="music"></div>
+```
+
+```js
+// 插件参数
+let options = {
+    el: '#music',
+    list: [],
+    mode: 'slide', // move/slide
+},
+dataUrl = '/mock/music.json';
+
+window.onload = function () {  
+    getList();
+}
+
+
+// 获取歌曲列表
+async function getList () {  
+    let data = await axios.get(dataUrl);
+    if (data.status === 200) {
+        options.list = [...data.data];
+        init(options);
+    }
+}
+
+// 初始化参数
+function init (options) {  
+    new XqMusic(options);
+}
 ```
 
 ### vue3
@@ -29,52 +98,43 @@ const app = createApp(App);
 app.use(xqMusic);
 ```
 
-### detail
+```vue
+<template>
+    <div>
+        <xq-music :list="post.list"></xq-music>
+    </div>
+</template>
 
-```html
-<div id="music"></div>
-```
+<script setup>
 
-```js
-let songs = [
-    {
-        id: 1,
-        name: '麻雀',
-        author: '李荣浩',
-        pic: './data/lrh-mq.jpg',
-        lyric_url: './data/lrh-mq.lrc',
-        url: './data/lrh-mq.mp3',
-    },
-    {
-        id: 2,
-        name: '年少有为',
-        author: '李荣浩',
-        pic: './data/lrh-nsyw.jpg',
-        lyric_url: './data/lrh-nsyw.lrc',
-        url: './data/lrh-nsyw.mp3',
-    },
-    {
-        id: 3,
-        name: '爸爸妈妈',
-        author: '李荣浩',
-        pic: './data/lrh-bbmm.jpg',
-        lyric_url: './data/lrh-bbmm.lrc',
-        url: './data/lrh-bbmm.mp3',
+import { reactive, getCurrentInstance } from 'vue'
+
+const { proxy } = getCurrentInstance();
+
+const demo = reactive({
+    list: [],
+});
+
+onMounted(() => {
+    getMusicList();
+})
+
+async function getMusicList () {  
+    let url = '/mock/music.json';
+    let data = await proxy.$http.get(url);
+    if (data.status === 200) {
+        let list = data.data;
+        if (list && list.length) {
+            demo.list = list;
+        }
     }
-]
-
-let options = {
-    el: '#music',
-    list: songs,
-    mode: 'slide', // move/slide
 }
-
-new XqMusic(options);
+</script>
 ```
 
 ### preview
 
-![xqlight](https://xqgj.cc/xqmusic-player/img/preview.jpg)
+![xqlight](./docs/img/preview.jpg)
 
 ## issue
 

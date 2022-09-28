@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "name": "麻雀",
+        "author": "李荣浩",
+        "pic": "./lrh-mq.jpg",
+        "lyric_url": "./lrh-mq.lrc",
+        "url": "./lrh-mq.mp3"
+    },
+    {
+        "id": 2,
+        "name": "年少有为",
+        "author": "李荣浩",
+        "pic": "./lrh-nsyw.jpg",
+        "lyric_url": "./lrh-nsyw.lrc",
+        "url": "./lrh-nsyw.mp3"
+    },
+    {
+        "id": 3,
+        "name": "爸爸妈妈",
+        "author": "李荣浩",
+        "pic": "./lrh-bbmm.jpg",
+        "lyric_url": "./lrh-bbmm.lrc",
+        "url": "./lrh-bbmm.mp3"
+    }
+]
