@@ -1,10 +1,10 @@
 {
   "name": "xqmusic-player",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "This is a simplify music player.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "demo": "node test/index.js"
+    "test:browser": "live-server --port=4001 --host=localhost"
   },
   "repository": {
     "type": "git",

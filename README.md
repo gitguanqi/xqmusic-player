@@ -9,11 +9,11 @@ This is a simplify music player.
 ```html
 <!-- cdn css -->
 <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-<link rel="stylesheet" href="https://unpkg.com/xqmusic-player/libs/css/xqmusic.min.css">
+<link rel="stylesheet" href="https://unpkg.com/xqmusic-player/lib/css/xqmusic.min.css">
 <!-- cdn js -->
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.27.2/axios.min.js"></script>
-<script src="https://unpkg.com/xqgjs/libs/gjs.min.js"></script>
-<script src="https://unpkg.com/xqmusic-player@1.0.1/libs/js/xqmusic.min.js"></script>
+<script src="https://unpkg.com/xqgjs/lib/xqgjs.min.js"></script>
+<script src="https://unpkg.com/xqmusic-player/lib/js/xqmusic.min.js"></script>
 ```
 
 ### use npm
@@ -134,7 +134,7 @@ async function getMusicList () {
 
 ### preview
 
-![xqlight](./docs/img/preview.jpg)
+![xqlight](https://unpkg.com/xqmusic-player/docs/img/preview.jpg)
 
 ## issue
 
