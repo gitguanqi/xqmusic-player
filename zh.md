@@ -1,12 +1,12 @@
 # xqmusic-player
 
-This is a simplify music player.
+这是一个简化版音乐播放器插件。
 
-[View Chinese documents](./zh.md)
+[查看英文文档](./README.md)
 
-## use
+## 使用
 
-### import cdn
+### 导入CDN
 
 ```html
 <!-- cdn css -->
@@ -18,13 +18,13 @@ This is a simplify music player.
 <script src="https://unpkg.com/xqmusic-player/lib/js/xqmusic.min.js"></script>
 ```
 
-### use npm
+### NPM安装
 
 ```sh
 npm i xqmusic-player
 ```
 
-### mock
+### 模拟数据
 
 `/mock/music.json`:
 
@@ -57,14 +57,14 @@ npm i xqmusic-player
 ]
 ```
 
-### browser
+### 游览器端
 
 ```html
 <div id="music"></div>
 ```
 
 ```js
-// options
+// 插件参数
 let options = {
     el: '#music',
     list: [],
@@ -77,7 +77,7 @@ window.onload = function () {
 }
 
 
-// list
+// 获取歌曲列表
 async function getList () {  
     let data = await axios.get(dataUrl);
     if (data.status === 200) {
@@ -86,7 +86,7 @@ async function getList () {
     }
 }
 
-// initialize
+// 初始化参数
 function init (options) {  
     new XqMusic(options);
 }
@@ -134,14 +134,14 @@ async function getMusicList () {
 </script>
 ```
 
-### preview
+### 预览
 
 ![xqlight](https://unpkg.com/xqmusic-player/test/img/preview.jpg)
 
-## issue
+## 问题
 
-[submit your question](https://github.com/gitguanqi/xqmusic-player/issues/new)
+[提交问题](https://github.com/gitguanqi/xqmusic-player/issues/new)
 
-## author
+## 作者
 
 [@gitguanqi](https://github.com/gitguanqi)
