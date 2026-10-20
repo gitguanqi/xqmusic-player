@@ -1,26 +1,25 @@
 [
     {
         "id": 1,
-        "name": "麻雀",
-        "author": "李荣浩",
-        "pic": "./lrh-mq.jpg",
-        "lyric_url": "./lrh-mq.lrc",
-        "url": "./lrh-mq.mp3"
+        "name": "第一首",
+        "author": "甲",
+        "pic": "./img/preview.jpg",
+        "lyric_url": "./mock/song-a.lrc",
+        "url": "./mock/tone.wav"
     },
     {
         "id": 2,
-        "name": "年少有为",
-        "author": "李荣浩",
-        "pic": "./lrh-nsyw.jpg",
-        "lyric_url": "./lrh-nsyw.lrc",
-        "url": "./lrh-nsyw.mp3"
+        "name": "第二首",
+        "author": "乙",
+        "pic": "./img/preview.jpg",
+        "lyric_url": "./mock/song-b.lrc",
+        "url": "./mock/tone.wav"
     },
     {
         "id": 3,
-        "name": "爸爸妈妈",
-        "author": "李荣浩",
-        "pic": "./lrh-bbmm.jpg",
-        "lyric_url": "./lrh-bbmm.lrc",
-        "url": "./lrh-bbmm.mp3"
+        "name": "没有歌词的歌",
+        "author": "丙",
+        "pic": "./img/preview.jpg",
+        "url": "./mock/tone.wav"
     }
 ]

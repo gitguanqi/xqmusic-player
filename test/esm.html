@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESM —— xqmusic-player</title>
+    <link rel="icon" href="./assets/test-icon.svg" type="image/svg+xml">
+    <!-- 图标替身：正式用页面里应当引 Font Awesome，但自检页必须能离线跑 -->
+    <link rel="stylesheet" href="./assets/icon-shim.css">
+    <link rel="stylesheet" href="./assets/demo.css">
+    <link rel="stylesheet" href="../lib/css/xqmusic.min.css">
+</head>
+<body>
+    <header class="site">
+        <img src="./assets/test-icon.svg" alt="">
+        <h1>xqmusic-player · ESM</h1>
+    </header>
+
+    <nav class="pages">
+        <a href="./index.html">索引</a>
+        <a href="./umd.html">UMD / 浏览器全局</a>
+        <a href="./esm.html" aria-current="page">ESM</a>
+        <a href="./vue3.html">Vue 3</a>
+    </nav>
+
+    <main>
+        <div class="card">
+            <h2>自检结果</h2>
+            <p class="hint">
+                本页用真正的 <code>&lt;script type="module"&gt;</code> 导入 <code>lib/js/xqmusic-utils.mjs</code>，
+                并把它与 UMD 构建暴露的 <code>XqMusic.utils</code> 逐项对拍。
+                <br>
+                说明：构造器目前只有 UMD/全局形态（浏览器 ESM 构建在 2.0.0 计划里），
+                所以本页同时验证「ESM 工具模块可用」与「两条路径行为一致」。
+            </p>
+            <output class="status" id="status" aria-live="polite">检查中…</output>
+            <ul class="checks" id="checks"></ul>
+        </div>
+
+        <div class="card">
+            <h2>可交互 demo（由 UMD 构建创建）</h2>
+            <p class="hint">ESM 侧提供纯函数，DOM 渲染仍由 UMD 构建负责。</p>
+            <div id="demo"></div>
+        </div>
+    </main>
+
+    <script src="./assets/check-runner.js"></script>
+    <script src="./stub/xqgjs-stub.js"></script>
+    <script src="../lib/js/xqmusic.min.js"></script>
+    <script type="module">
+        import * as utils from '../lib/js/xqmusic-utils.mjs';
+        import { findLyricIndex, formatTime, parseLyric } from '../lib/js/xqmusic-utils.mjs';
+
+        window.XqDemo.setStatus('pending', '检查中…');
+
+        let demo = null;
+        const songs = [
+            { id: 1, name: '第一首', author: '甲', pic: './img/preview.jpg', url: './mock/tone.wav', lyric_url: './mock/song-a.lrc' },
+            { id: 2, name: '第二首', author: '乙', pic: './img/preview.jpg', url: './mock/tone.wav', lyric_url: './mock/song-b.lrc' },
+        ];
+
+        window.XqDemo.check('ESM 命名导出齐全', () => {
+            const names = ['escapeHtml', 'pad2', 'formatTime', 'parseLyric', 'findLyricIndex'];
+            const missing = names.filter((n) => typeof utils[n] !== 'function');
+            return { ok: missing.length === 0, detail: missing.length ? '缺少 ' + missing.join(',') : names.join(',') };
+        });
+
+        window.XqDemo.check('formatTime 边界（10 秒不能被补成 010）', () => {
+            const cases = [[0, '00:00'], [9, '00:09'], [10, '00:10'], [59, '00:59'], [60, '01:00'], [600, '10:00']];
+            const bad = cases.filter(([input, expect]) => formatTime(input).m !== expect);
+            return { ok: bad.length === 0, detail: bad.length ? JSON.stringify(bad) : '9/10/59/60/600 全部正确' };
+        });
+
+        window.XqDemo.check('parseLyric 解析时间轴', () => {
+            const lrc = parseLyric('[00:00.00]a\n[00:05.50]b\n[01:00.00]c');
+            return { ok: lrc.ms.length === 3 && lrc.ms[1].t === 5.5 && lrc.ms[2].t === 60, detail: JSON.stringify(lrc.ms.map((m) => m.t)) };
+        });
+
+        window.XqDemo.check('parseLyric 空输入返回空结构（不是 undefined）', () => {
+            const lrc = parseLyric('');
+            return { ok: !!lrc && Array.isArray(lrc.ms) && lrc.ms.length === 0, detail: JSON.stringify(lrc) };
+        });
+
+        window.XqDemo.check('findLyricIndex 二分定位正确', () => {
+            const list = parseLyric('[00:00.00]a\n[00:05.00]b\n[00:10.00]c').ms;
+            const ok = findLyricIndex(list, 0) === 0
+                && findLyricIndex(list, 7) === 1
+                && findLyricIndex(list, 99) === 2;
+            return { ok, detail: [0, 7, 99].map((t) => t + '→' + findLyricIndex(list, t)).join(' ') };
+        });
+
+        window.XqDemo.check('ESM 与 UMD 两份实现行为一致', () => {
+            const u = window.XqMusic.utils;
+            const sample = '[ti:x]\n[00:01.20]一\n[00:03.40]二';
+            const sameParse = JSON.stringify(u.parseLyric(sample)) === JSON.stringify(parseLyric(sample));
+            const sameTime = [0, 9, 10, 61, 3599].every((s) => JSON.stringify(u.formatTime(s)) === JSON.stringify(formatTime(s)));
+            const sameEscape = ['<a b="c">', "'", '&'].every((s) => u.escapeHtml(s) === utils.escapeHtml(s));
+            return { ok: sameParse && sameTime && sameEscape, detail: 'parse=' + sameParse + ' time=' + sameTime + ' escape=' + sameEscape };
+        });
+
+        window.XqDemo.check('UMD 构建在模块环境下仍暴露全局', () => {
+            return { ok: typeof window.XqMusic === 'function', detail: 'typeof window.XqMusic = ' + typeof window.XqMusic };
+        });
+
+        window.XqDemo.check('用 UMD 构建渲染 demo', () => {
+            demo = new window.XqMusic({ el: '#demo', list: songs });
+            const items = document.querySelectorAll('#demo .xqmusic-menu-ls li');
+            return { ok: items.length === 2, detail: 'li=' + items.length };
+        });
+
+        await window.XqDemo.report({
+            liveCount: () => document.querySelectorAll('#demo .xqmusic').length,
+        });
+    </script>
+</body>
+</html>

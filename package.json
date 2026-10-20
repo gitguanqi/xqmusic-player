@@ -1,10 +1,51 @@
 {
   "name": "xqmusic-player",
-  "version": "1.0.7",
-  "description": "This is a simplify music player.",
+  "version": "1.2.0",
+  "description": "A lightweight, dependency-light music player widget for the browser (UMD + Vue 3).",
+  "type": "commonjs",
+  "main": "lib/js/xqmusic.js",
+  "browser": "lib/js/xqmusic.js",
+  "unpkg": "lib/js/xqmusic.min.js",
+  "jsdelivr": "lib/js/xqmusic.min.js",
+  "style": "lib/css/xqmusic.css",
+  "exports": {
+    ".": "./lib/js/xqmusic.js",
+    "./vue": "./lib/vue/xqmusic.js",
+    "./xqmusic.vue": "./lib/vue/xqmusic.vue",
+    "./utils": "./lib/js/xqmusic-utils.mjs",
+    "./lib/*": "./lib/*",
+    "./*": "./*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "zh.md"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "test:browser": "live-server --port=4001 --host=localhost"
+    "build": "node scripts/build.mjs",
+    "build:check": "node scripts/build.mjs --check",
+    "build:demo": "node scripts/build-vue-demo.mjs",
+    "pretest": "node scripts/build-vue-demo.mjs",
+    "test": "node --test test/unit.test.mjs test/utils-parity.test.mjs test/contract.test.mjs test/harness.test.mjs",
+    "test:harness": "node scripts/dom-harness.mjs",
+    "test:browser": "node scripts/serve.mjs",
+    "verify:browser": "node scripts/browser-check.mjs",
+    "prepublishOnly": "npm run build:check && npm test"
+  },
+  "peerDependencies": {
+    "vue": ">=3.2.0",
+    "xqgjs": ">=1.1.0"
+  },
+  "peerDependenciesMeta": {
+    "vue": {
+      "optional": true
+    },
+    "xqgjs": {
+      "optional": true
+    }
   },
   "repository": {
     "type": "git",
@@ -12,6 +53,11 @@
   },
   "keywords": [
     "player",
+    "music",
+    "audio",
+    "lyric",
+    "vue",
+    "umd",
     "xqmusic-player"
   ],
   "author": "gitguanqi",
@@ -19,5 +65,12 @@
   "bugs": {
     "url": "https://github.com/gitguanqi/xqmusic-player/issues"
   },
-  "homepage": "https://github.com/gitguanqi/xqmusic-player#readme"
+  "homepage": "https://github.com/gitguanqi/xqmusic-player#readme",
+  "devDependencies": {
+    "@vue/compiler-sfc": "^3.5.13",
+    "esbuild": "^0.25.10",
+    "jsdom": "^26.1.0",
+    "playwright-core": "^1.55.0",
+    "vue": "^3.5.13"
+  }
 }

@@ -1,0 +1,241 @@
+/* 测试页共用样式。与播放器自己的 lib/css/xqmusic.css 无关，只负责页面外壳。 */
+
+:root {
+    --fg: #1d2129;
+    --fg-dim: #5b6470;
+    --bg: #f7f8fa;
+    --card: #ffffff;
+    --line: #dfe3e8;
+    --accent: #d32d2d;
+    --pass: #1a7f37;
+    --fail: #b42318;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0 16px 48px;
+    font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    line-height: 1.6;
+}
+
+header.site {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 20px 0 12px;
+}
+
+header.site img {
+    width: 36px;
+    height: 36px;
+}
+
+header.site h1 {
+    font-size: 18px;
+    margin: 0;
+    flex: 1;
+}
+
+nav.pages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 860px;
+    margin: 0 auto 20px;
+}
+
+nav.pages a {
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--fg-dim);
+    font-size: 13px;
+    text-decoration: none;
+}
+
+nav.pages a[aria-current="page"] {
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+main {
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.card h2 {
+    font-size: 14px;
+    margin: 0 0 12px;
+    color: var(--fg-dim);
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.status {
+    display: block;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    font-weight: 600;
+    font-size: 14px;
+    background: #fff8e5;
+    color: #7a5b00;
+}
+
+.status.is-pass {
+    background: #e9f7ec;
+    border-color: #b7e0c1;
+    color: var(--pass);
+}
+
+.status.is-fail {
+    background: #fdeceb;
+    border-color: #f3c2bd;
+    color: var(--fail);
+}
+
+ul.checks {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    font-size: 13px;
+}
+
+/* 结论行要能在 390px 窄屏下换行：检查名很长且带 detail，不换行会把整页顶宽 */
+ul.checks .check {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    align-items: baseline;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--line);
+}
+
+ul.checks .check:last-child {
+    border-bottom: none;
+}
+
+ul.checks .badge {
+    flex: none;
+    min-width: 42px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 1px 4px;
+    background: #eceff2;
+    color: var(--fg-dim);
+}
+
+ul.checks .is-pass .badge {
+    background: #e9f7ec;
+    color: var(--pass);
+}
+
+ul.checks .is-fail .badge {
+    background: #fdeceb;
+    color: var(--fail);
+}
+
+ul.checks .name {
+    flex: 0 1 auto;
+    min-width: 0;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+ul.checks .detail {
+    flex: 1 1 100%;
+    min-width: 0;
+    padding-left: 50px;
+    color: var(--fg-dim);
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 520px) {
+    ul.checks .detail {
+        padding-left: 0;
+    }
+}
+
+.demo-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.demo-slot {
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+.hint {
+    font-size: 13px;
+    color: var(--fg-dim);
+    margin: 0 0 12px;
+}
+
+code {
+    background: #eef1f4;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 12px;
+}
+
+.index-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.index-list li {
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line);
+}
+
+.index-list li:last-child {
+    border-bottom: none;
+}
+
+.index-list a {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.index-list p {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--fg-dim);
+}
+
+@media (max-width: 520px) {
+    header.site {
+        flex-wrap: wrap;
+    }
+
+    nav.pages {
+        font-size: 12px;
+    }
+}

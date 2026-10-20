@@ -1,66 +1,103 @@
 <template>
-    <div class="xqmusic" ref="xqmusic">
-        <div class="xqmusic-top active">
-            <ul v-show="musics.showList" class="xqmusic-menu-ls scroll-box">
-                <li v-for="item in musics.list" :key="item.id" :class="{'active': musics.index === (item.id-1)}" @click="songPlay(item.id-1)">
-                    <span class="overflow">{{item.name}}</span>
-                    <button class="song-play">
-                        <i :class="{'fa': true, [(musics.isPlay && item.id === musics.index+1) ? 'fa-pause' : 'fa-play']: true}"></i>
+    <div class="xqmusic" :class="{ slide: mode === 'slide' }" ref="rootRef">
+        <div class="xqmusic-top" :class="{ active: !showLrc && !showList }">
+            <!-- 列表 / 歌词的显隐一律用行内 display：
+                 外部样式表对这两个容器有 display:none，v-show 移除行内值后会被样式表压回去 -->
+            <ul class="xqmusic-menu-ls scroll-box" :style="{ display: showList ? 'block' : 'none' }">
+                <li
+                    v-for="(item, index) in songs"
+                    :key="item.id !== undefined ? item.id : index"
+                    :class="{ active: index === currentIndex }"
+                    @click="playFrom(index)"
+                >
+                    <span class="overflow" :title="item.name">{{ item.name }}</span>
+                    <button type="button" class="song-play" :title="index === currentIndex && isPlay ? '暂停' : '播放'">
+                        <i class="fa" :class="index === currentIndex && isPlay ? 'fa-pause' : 'fa-play'"></i>
                     </button>
                 </li>
             </ul>
-            <ul v-if="musics.showLrc && musics.lyrics && musics.lyrics.length" ref="xqmusic-lyric-ls" class="xqmusic-lyric-ls scroll-box">
-                <li v-for="(item, index) in musics.lyrics" :key="index">
-                    {{ item.c }}
-                </li>
-            </ul>
-            <ul v-if="musics.showLrc && musics.lyrics && musics.lyrics.length === 0">
-                <li>暂无歌词</li>
+            <ul
+                ref="lyricRef"
+                class="xqmusic-lyric-ls scroll-box"
+                :style="{ display: showLrc ? 'block' : 'none' }"
+            >
+                <li v-if="!lyrics.length">暂无歌词</li>
+                <li v-for="(line, index) in lyrics" :key="index">{{ line.c }}</li>
             </ul>
         </div>
         <div class="xqmusic-bottom">
-            <audio id="xqmusic-audio" ref="xqmusic-audio" :src="`${musics.list && musics.list.length ? musics.list[musics.index].url : ''}`"></audio>
+            <audio class="xqmusic-audio" ref="audioRef" :src="current ? current.url : ''"></audio>
             <!-- 歌曲封面图 -->
             <div class="xqmusic-img">
-                <div id="xqmusic-cover-img" :class="{'active': musics.isPlay}" :style="{'backgroundImage': `url(${musics.list && musics.list.length ? musics.list[musics.index].pic : ''})`}"></div>
+                <div
+                    class="xqmusic-cover-img"
+                    :class="{ active: isPlay }"
+                    :style="{ backgroundImage: coverStyle }"
+                ></div>
             </div>
             <div class="xqmusic-main">
                 <!-- 歌曲标题 -->
                 <div class="xqmusic-title">
-                    <small class="overflow" id="xqmusic-song-title">{{musics.list && musics.list.length ? musics.list[musics.index].author : '歌手'}} - {{musics.list && musics.list.length ? musics.list[musics.index].name : '歌曲名'}}</small>
+                    <small class="overflow xqmusic-song-title">{{ title }}</small>
                 </div>
                 <!-- 歌曲进度条 -->
                 <div class="xqmusic-progress">
-                    <small id="xqmusic-current">{{ musics.currentTime }}</small>
-                    <span>
-                        <i id="xqmusic-progress-bar" :style="{'width': musics.progress+'%'}"></i>
-                    </span>
-                    <small id="xqmusic-total">{{ musics.totalTime }}</small>
+                    <small class="xqmusic-current">{{ currentTime }}</small>
+                    <span><i class="xqmusic-progress-bar" :style="{ width: progress + '%' }"></i></span>
+                    <small class="xqmusic-total">{{ totalTime }}</small>
                 </div>
                 <!-- 歌曲操作按钮 -->
                 <div class="xqmusic-btns">
-                    <button id="xqmusic-muted" title="静音" v-show="musics.showVol" @click="toggleVol(false)">
-                        <i class="fa fa-volume-down"></i>
-                    </button>
-                    <button id="xqmusic-volumn" title="声音" v-show="!musics.showVol" @click="toggleVol(true)">
+                    <button
+                        type="button"
+                        class="xqmusic-muted"
+                        :class="{ active: muted }"
+                        :style="{ display: muted ? 'block' : 'none' }"
+                        title="取消静音"
+                        @click="setMuted(false)"
+                    >
                         <i class="fa fa-volume-mute"></i>
                     </button>
-                    <button id="xqmusic-prev" title="上一首" @click="playPrev">
+                    <button
+                        type="button"
+                        class="xqmusic-volumn"
+                        :class="{ active: !muted }"
+                        :style="{ display: muted ? 'none' : 'block' }"
+                        title="静音"
+                        @click="setMuted(true)"
+                    >
+                        <i class="fa fa-volume-down"></i>
+                    </button>
+                    <button type="button" class="xqmusic-prev" title="上一首" @click="playPrev">
                         <i class="fa fa-chevron-left"></i>
                     </button>
-                    <button id="xqmusic-pause" title="暂停" v-show="musics.isPlay" @click="togglePlay('pause')">
+                    <button
+                        type="button"
+                        class="xqmusic-pause"
+                        :class="{ active: isPlay }"
+                        :style="{ display: isPlay ? 'block' : 'none' }"
+                        title="暂停"
+                        @click="togglePlay"
+                    >
                         <i class="fa fa-pause"></i>
                     </button>
-                    <button id="xqmusic-play" class="active" title="播放" v-show="!musics.isPlay" @click="togglePlay('play')">
+                    <button
+                        type="button"
+                        class="xqmusic-play"
+                        :class="{ active: !isPlay }"
+                        :style="{ display: isPlay ? 'none' : 'block' }"
+                        title="播放"
+                        @click="togglePlay"
+                    >
                         <i class="fa fa-play"></i>
                     </button>
-                    <button id="xqmusic-next" title="下一首" @click="playNext">
+                    <button type="button" class="xqmusic-next" title="下一首" @click="playNext">
                         <i class="fa fa-chevron-right"></i>
                     </button>
-                    <button id="xqmusic-word" title="歌词" @click="toggleList('lrc')">
+                    <button type="button" class="xqmusic-word" title="歌词" @click="toggleList('lrc')">
                         <i class="fa fa-file-word"></i>
                     </button>
-                    <button id="xqmusic-list" title="列表" @click="toggleList('list')">
+                    <button type="button" class="xqmusic-list" title="列表" @click="toggleList('list')">
                         <i class="fa fa-list"></i>
                     </button>
                 </div>
@@ -70,478 +107,208 @@
 </template>
 
 <script setup>
-    import { onMounted, reactive, getCurrentInstance, defineProps, toRefs } from 'vue'
-
-    const { proxy } = getCurrentInstance();
+    import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+    import { findLyricIndex, formatTime, parseLyric } from '../js/xqmusic-utils.mjs'
+    // 直接消费 UMD 版同一份样式表：不再内联一份 <style>，也不需要 less 预处理器。
+    // 所有选择器都以 .xqmusic 开头，不会污染宿主页面。
+    import '../css/xqmusic.css'
 
     const props = defineProps({
-        list: Array,
-    });
-    
-    const musics = reactive({
-        list: [], // 歌曲数据
-        index: 0, // 当前索引
-        lyrics: [], // 歌词列表
-        showLrc: false, // 显示歌词框
-        showList: false, // 显示歌曲列表
-        showVol: true, // 是否静音
-        isPlay: false, // 是否播放
-        currentTime: '00:00', // 当前播放时间
-        totalTime: '00:00', // 总时间
-        progress: 0, // 进度条时间
-    })
-    
-    onMounted(() => {
-        init();
+        /** 歌曲列表，字段见 README：id / name / author / pic / url / lyric_url */
+        list: { type: Array, default: () => [] },
+        /** 'slide' 固定在右下角，'move' 由宿主自行定位 */
+        mode: { type: String, default: 'slide' },
     })
 
-    // 初始化
-    function init () {
-        // 获取列表
-        getList();
-    }
+    const LYRIC_LINE_HEIGHT = 36
 
-    // 获取列表
-    function getList () {
-        let { list } = props;
-        for (const key in list) {
-            let item = list[key];
-            musics.list.push(item);
-        }
-        if (musics.list && musics.list.length) {
-            getLyric(musics.list[musics.index].lyric_url);
-        }
-    }
+    const rootRef = ref(null)
+    const audioRef = ref(null)
+    const lyricRef = ref(null)
 
-    // 获取歌词
-    async function getLyric (url) {  
-        let data = await proxy.$http.get(url);
-        let lrcs = parseLyric(data.data);
-        showLyric(lrcs);
-    }
+    const songs = ref([])
+    const currentIndex = ref(0)
+    const lyrics = ref([])
+    const showLrc = ref(false)
+    const showList = ref(false)
+    const isPlay = ref(false)
+    const muted = ref(false)
+    const currentTime = ref('00:00')
+    const totalTime = ref('00:00')
+    const progress = ref(0)
 
-    // 解析歌词
-    function parseLyric (data) {
-        let lrc = {
-            ti: '', // 歌名
-            ar: '', // 歌手
-            al: '', // 专辑
-            by: '', // 歌词作者
-            offset: 0, // 时间毫秒，调整歌词位置
-            ms: [] // 歌词{t:时间，c:歌词}
-        }
-        if (data.length === 0) return;
-        let lrcs = data.split('\n');
-        for (let key in lrcs) {
-            lrcs[key] = lrcs[key].replace(/(^\s*)|(\s*$)/g, '');
-            let t = lrcs[key].substring(lrcs[key].indexOf("[") + 1, lrcs[key].indexOf("]"));
-            let s = t.split(":");
-            if (isNaN(parseInt(s[0]))) { // 非数值
-                for (const lKey in lrc) {
-                    if (lKey !== 'ms' &&
-                        lKey == s[0].toLowerCase()) {
-                        lrc[lKey] = s[1];
-                    }
-                }
+    let activeLine = null
+    let lyricToken = 0
+
+    const current = computed(() => songs.value[currentIndex.value] || null)
+
+    const title = computed(() => {
+        const song = current.value
+        if (!song) return '歌手 - 歌曲名'
+        return (song.author || '') + ' - ' + (song.name || '')
+    })
+
+    const coverStyle = computed(() => {
+        const song = current.value
+        return song && song.pic ? `url(${song.pic})` : ''
+    })
+
+    // props.list 可能晚于挂载才到（异步请求），必须 watch 而不是只拷一次
+    watch(
+        () => props.list,
+        (list) => {
+            songs.value = Array.isArray(list) ? list.slice() : []
+            if (currentIndex.value >= songs.value.length) currentIndex.value = 0
+            if (songs.value.length) {
+                loadLyric(current.value)
             } else {
-                let arr = lrcs[key].match(/\[(\d+:.+?)\]/g); // 时间
-                let start = 0;
-                for (const k in arr) {
-                    start += arr[k].length; // 歌词位置
-                }
-                let content = lrcs[key].substring(start); // 歌词内容
-                for (const k in arr) {
-                    let t = arr[k].substring(1, arr[k].length - 1);
-                    let s = t.split(":");
-                    lrc.ms.push({
-                        t: (parseFloat(s[0]) * 60 + parseFloat(s[1])).toFixed(3),
-                        c: content,
-                    })
-                }
+                lyrics.value = []
+            }
+        },
+        { immediate: true }
+    )
+
+    onMounted(() => {
+        // timeupdate 只在挂载时注册一次；旧实现放在 togglePlay 里，点几次就有几个监听
+        if (audioRef.value) audioRef.value.addEventListener('timeupdate', onTimeUpdate)
+    })
+
+    onBeforeUnmount(() => {
+        if (audioRef.value) {
+            audioRef.value.removeEventListener('timeupdate', onTimeUpdate)
+            try {
+                audioRef.value.pause()
+            } catch (e) {
+                /* ignore */
             }
         }
-        lrc.ms.sort(function (a, b) {
-            return a.t - b.t;
-        })
-        return lrc;
-    }
+        activeLine = null
+    })
 
-    // 显示歌词
-    function  showLyric (lrc) {
-        let lrcs = [];
-        for (const item of lrc.ms) {
-            lrcs.push(item);
-        }
-        musics.lyrics = [...lrcs];
-    }
-
-    // 显示歌词位置
-    function showLyricPos (time) {
-        let xqLyricBox = document.querySelector('.xqmusic-lyric-ls');
-        let lrcItem = document.querySelectorAll('.xqmusic-lyric-ls li');
-        if (musics.lyrics && musics.lyrics.length === 0) return;
-        for (let i = 0; i < musics.lyrics.length; i++) {
-            let item = musics.lyrics[i];
-            let diff = time - item.t;
-            if (diff >= 0 && diff < 1) {
-                for (const item of lrcItem) {
-                    item.className = '';
-                }
-                if (!lrcItem[i]) return;
-                lrcItem[i].className = 'active';
-                let lyrTop = lrcItem[i].offsetTop - proxy.$refs.xqmusic.offsetTop;
-                let midTop = xqLyricBox.offsetHeight / 2;
-                let allowLineNum = midTop / 36;
-                let diffTop = lyrTop - midTop;
-                if (i >= allowLineNum && diffTop > 0) {
-                    xqLyricBox.scrollTop = diffTop;
-                } else {
-                    xqLyricBox.scrollTop = 0;
-                }
-            }
+    /**
+     * 加载并解析歌词。用原生 fetch，不再要求宿主注入 $http / axios。
+     * 任何失败都降级成「暂无歌词」，不抛出。
+     */
+    async function loadLyric(song) {
+        const token = ++lyricToken
+        lyrics.value = []
+        activeLine = null
+        if (!song || !song.lyric_url) return
+        try {
+            const res = await fetch(song.lyric_url, { credentials: 'same-origin' })
+            if (!res.ok) throw new Error('HTTP ' + res.status)
+            const text = await res.text()
+            if (token !== lyricToken) return // 期间已切歌，丢弃过期结果
+            lyrics.value = parseLyric(text).ms
+        } catch (e) {
+            lyrics.value = []
         }
     }
 
-    // 切换列表
-    function toggleList (type) {
+    /**
+     * 歌词高亮：二分查找当前行，只写 className，不做全表 offsetTop 扫描。
+     */
+    function highlight(time) {
+        const box = lyricRef.value
+        if (!box || !lyrics.value.length) return
+        const index = findLyricIndex(lyrics.value, time)
+        if (index < 0) return
+        const lines = box.querySelectorAll('li')
+        const line = lines[index]
+        if (!line || line === activeLine) return
+
+        if (activeLine) activeLine.classList.remove('active')
+        line.classList.add('active')
+        activeLine = line
+
+        const height = box.clientHeight || 0
+        if (!height) return
+        const target = Math.max(0, index * LYRIC_LINE_HEIGHT - (height - LYRIC_LINE_HEIGHT) / 2)
+        if (Math.abs(box.scrollTop - target) >= 1) box.scrollTop = target
+    }
+
+    function onTimeUpdate() {
+        const audio = audioRef.value
+        if (!audio) return
+        const time = Number(audio.currentTime) || 0
+        const duration = Number(audio.duration)
+        currentTime.value = formatTime(time).m
+        totalTime.value = duration > 0 ? formatTime(duration).m : '00:00'
+        progress.value = duration > 0 ? Math.min(100, (time / duration) * 100) : 0
+        highlight(time)
+    }
+
+    function toggleList(type) {
         if (type === 'lrc') {
-            musics.showList = false;
-            musics.showLrc = !musics.showLrc;
+            showList.value = false
+            showLrc.value = !showLrc.value
         } else {
-            musics.showLrc = false;
-            musics.showList = !musics.showList;
+            showLrc.value = false
+            showList.value = !showList.value
         }
     }
 
-    // 切换声音
-    function toggleVol (type) {  
-        musics.showVol = type;
-        proxy.$refs['xqmusic-audio'].muted = type ? false : true;
+    function setMuted(flag) {
+        muted.value = !!flag
+        if (audioRef.value) audioRef.value.muted = muted.value
     }
 
-    // 是否播放
-    function togglePlay (type) {  
-        musics.isPlay = type == 'play' ? true: false;
-        if (musics.isPlay) {
-            proxy.$refs['xqmusic-audio'].play();
-        } else {
-            proxy.$refs['xqmusic-audio'].pause();
+    async function togglePlay() {
+        const audio = audioRef.value
+        if (!audio) return
+        if (isPlay.value) {
+            audio.pause()
+            isPlay.value = false
+            return
         }
-        proxy.$refs['xqmusic-audio'].addEventListener('timeupdate', getTime, false);
-    }
-
-    // 上一首
-    function playPrev () {  
-        if (musics.index === 0) {
-            musics.index = musics.list.length;
-        }
-        musics.index--;
-        playSong();
-    }
-
-    // 下一首
-    function playNext () {  
-        if (musics.index >= 0 && musics.index <= musics.list.length) {
-        musics.index++;
-        }
-        if (musics.index == musics.list.length) {
-            musics.index = 0;
-        }
-        playSong();
-    }
-
-    // 歌曲切换
-    function songPlay (index) {  
-        musics.index = index;
-        playSong();
-    }
-
-    // 播放歌曲
-    function playSong () {  
-        let item = musics.list[musics.index];
-        getLyric(item.lyric_url);
-        musics.isPlay = false;
-        musics.currentTime = '00:00';
-        musics.progress = 0;
-        musics.totalTime = '00:00';
-        proxy.$refs['xqmusic-audio'].load();
-    }
-
-    // 获取时间
-    function  getTime (e) {
-        if (!musics.isPlay) return;
-        let currentTime = proxy.$refs['xqmusic-audio'].currentTime || e.timeStamp / 1000;
-        musics.currentTime = calcTimeStr(currentTime).m;
-        musics.progress = (currentTime / proxy.$refs['xqmusic-audio'].duration) * 100;
-        musics.totalTime = proxy.$refs['xqmusic-audio'].duration ? calcTimeStr(proxy.$refs['xqmusic-audio'].duration).m : '00:00';
-        if (musics.list[musics.index].lyric_url) {
-            showLyricPos(currentTime);
+        try {
+            await audio.play()
+            isPlay.value = true
+        } catch (e) {
+            // 自动播放被浏览器拦截：保持未播放态，不要骗用户
+            isPlay.value = false
         }
     }
 
-    // 计算时间字符串
-    function calcTimeStr (second) {
-        let s = 0;
-        let m = 0;
-        let h = 0;
-        let sNum = second % 60;
-        let res = '';
-        if (second < 3600) {
-            s = sNum;
-            m = parseInt(second / 60);
-            h = 0;
-        } else {
-            let mNum = second % 3600;
-            if (mNum % 60 < 60) {
-                s = mNum % 60;
-                m = parseInt(mNum / 60)
+    function resetAndLoad() {
+        const audio = audioRef.value
+        currentTime.value = '00:00'
+        totalTime.value = '00:00'
+        progress.value = 0
+        isPlay.value = false
+        activeLine = null
+        loadLyric(current.value)
+        if (audio) {
+            try {
+                audio.pause()
+                audio.load()
+            } catch (e) {
+                /* ignore */
             }
-            m = parseInt(mNum / 60);
-            h = parseInt(second / 3600);
         }
-        s = s > 10 ? parseInt(s) : '0' + parseInt(s);
-        m = m > 10 ? m : '0' + m;
-        h = h > 10 ? h : '0' + h;
-        res = h + ':' + m + ':' + s;
-        return {
-            h: res,
-            m: m + ':' + s,
-        };
     }
 
-    function getId (id) {  
-        return document.getElementById(id);
+    function playFrom(index) {
+        if (!songs.value.length) return
+        if (index === currentIndex.value) {
+            togglePlay()
+            return
+        }
+        currentIndex.value = index
+        resetAndLoad()
     }
 
+    function playPrev() {
+        const len = songs.value.length
+        if (!len) return
+        currentIndex.value = (currentIndex.value - 1 + len) % len
+        resetAndLoad()
+    }
+
+    function playNext() {
+        const len = songs.value.length
+        if (!len) return
+        currentIndex.value = (currentIndex.value + 1) % len
+        resetAndLoad()
+    }
 </script>
-
-<style lang="less" scoped>
-.xqmusic {
-    margin: 10px auto;
-    max-width: 320px;
-    border-radius: 5px;
-
-    .overflow {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .scroll-box::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-
-    .scroll-box::-webkit-scrollbar-thumb {
-        border-radius: 20px;
-        -webkit-box-shadow: inset 0 0 5px #d32d2d;
-        box-shadow: inset 0 0 5px #d32d2d;
-        background: #d32d2d;
-    }
-
-    .scroll-box::-webkit-scrollbar-track {
-        -webkit-box-shadow: inset 0 0 5px white;
-        box-shadow: inset 0 0 5px white;
-        border-radius: 8px;
-        background: white;
-    }
-
-    @keyframes donut-spin {
-        0% {
-            transform: rotate(0deg);
-        }
-
-        100% {
-            transform: rotate(360deg);
-        }
-    }
-
-    & {
-        width: 100%;
-        &.slide {
-            position: fixed;
-            bottom: 25px;
-            right: -252px;
-            transition: all .5s;
-            &:hover {
-                right: 0;
-            }
-        }
-        &.move {
-            position: absolute;
-            &:hover {
-                cursor: move;
-            }
-        }
-    }
-
-    .xqmusic-top {
-        padding: 10px 0;
-        width: 100%;
-        border: 1px solid #ccc;
-        border-bottom: none;
-        &.active {
-            padding: 0;
-        }
-    }
-
-    .xqmusic-menu-ls,
-    .xqmusic-lyric-ls {
-        box-sizing: border-box;
-        padding: 10px 5px;
-        width: 100%;
-        height: 100%;
-        max-height: 200px;
-        overflow-x: hidden;
-        overflow-y: auto;
-        transition: all .5s;
-    }
-
-    .xqmusic-menu-ls {
-        li {
-            box-sizing: border-box;
-            padding: 5px 10px;
-            height: 35px;
-            font-size: 14px;
-            border-bottom: 1px dashed #ccc;
-            span {
-                display: inline-block;
-                width: 85%;
-                height: 25px;
-                line-height: 25px;
-            }
-            button {
-                position: relative;
-                top: -8px;
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                border: 2px solid #333;
-                cursor: pointer;
-                &.active {
-                    display: inline-block;
-                }
-            }
-            i {
-                position: relative;
-                left: -2px;
-                top: -2px;
-                font-size: 12px;
-            }
-            &.active {
-                color: #d32d2d;
-                button {
-                    border-color: #d32d2d;
-                }
-                i {
-                    color: #d32d2d;
-                }
-            }
-        }
-    }
-
-    .xqmusic-lyric-ls {
-        li {
-            font-size: 14px;
-            line-height: 2;
-            color: #333;
-            text-align: center;
-            &.active {
-                color: #d32d2d;
-                font-weight: bold;
-            }
-        }
-    }
-
-    .xqmusic-bottom {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        height: 65px;
-        overflow: hidden;
-        border: 1px solid #ccc;
-        /* 歌曲封面图 */
-        .xqmusic-img {
-            width: 65px;
-            height: 100%;
-            background: #333;
-            overflow: hidden;
-            #xqmusic-cover-img {
-                width: 100%;
-                height: 100%;
-                border-radius: 50%;
-                background: #ccc;
-                background-size: cover;
-                animation: donut-spin 10s linear infinite;
-                animation-play-state: paused;
-                overflow: hidden;
-                &.active {
-                    animation-play-state: running;
-                }
-            }
-        }
-    }
-
-    .xqmusic-main {
-        flex: 1;
-        height: 100%;
-        box-sizing: border-box;
-        padding: 2px;
-        /* 歌曲标题 */
-        .xqmusic-title {
-            max-width: 180px;
-            box-sizing: border-box;
-            padding-left: 5px;
-            font-size: 14px;
-            small {
-                display: inline-block;
-                width: auto;
-                max-width: 100%;
-            }
-
-        }
-        /* 歌曲进度条 */
-        .xqmusic-progress {
-            margin: 2px 0;
-            display: flex;
-            align-items: center;
-            text-align: center;
-            font-size: 12px;
-            span {
-                position: relative;
-                flex: 1;
-                height: 3px;
-                border-radius: 5px;
-                background: #ccc;
-                overflow: hidden;
-                i {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    display: inline-block;
-                    height: 100%;
-                    background-color: #d32d2d;
-                    transition: all .5s;
-                }
-            }
-            small {
-                width: 40px;
-            }
-        }
-        /* 歌曲操作按钮 */
-        .xqmusic-btns {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            button {
-                cursor: pointer;
-                i {
-                    font-size: 16px;
-                    color: #333;
-                }
-            }
-        }
-    }
-
-}
-</style>

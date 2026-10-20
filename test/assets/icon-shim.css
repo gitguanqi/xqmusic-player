@@ -1,0 +1,83 @@
+/*
+ * 测试专用图标替身。
+ *
+ * 播放器本体仍然输出 Font Awesome 的 class（fa / fa-play …），正式使用请在页面里引入 FA，
+ * 这一点 README 已经写明了。但测试页不能依赖外网 CDN：
+ * 一旦 CDN 不可达，图标是空的、页面还能跑，可这会让「视觉冒烟」失去意义，
+ * 也会让离线环境无法复现自检结果。
+ *
+ * 所以这里只用纯 CSS（SVG mask）还原播放器实际用到的 8 个图标，
+ * 保证断网时测试页的长相和联网时一致。
+ * 只在 test/*.html 里加载，不进 npm 包。
+ */
+
+.xqmusic .fa,
+.xqmusic-mock .fa {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    background-color: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+/* ▶ 播放 */
+.xqmusic .fa-play,
+.xqmusic-mock .fa-play {
+    -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E");
+}
+
+/* ❙❙ 暂停 */
+.xqmusic .fa-pause,
+.xqmusic-mock .fa-pause {
+    -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 5h3.5v14H7zm6.5 0H17v14h-3.5z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 5h3.5v14H7zm6.5 0H17v14h-3.5z'/%3E%3C/svg%3E");
+}
+
+/* ‹ 上一首 */
+.xqmusic .fa-chevron-left,
+.xqmusic-mock .fa-chevron-left {
+    -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15.4 4.6 7 12l8.4 7.4 1.4-1.6L10.2 12l6.6-5.8z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15.4 4.6 7 12l8.4 7.4 1.4-1.6L10.2 12l6.6-5.8z'/%3E%3C/svg%3E");
+}
+
+/* › 下一首 */
+.xqmusic .fa-chevron-right,
+.xqmusic-mock .fa-chevron-right {
+    -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8.6 4.6 7.2 6.2 13.8 12l-6.6 5.8 1.4 1.6L17 12z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8.6 4.6 7.2 6.2 13.8 12l-6.6 5.8 1.4 1.6L17 12z'/%3E%3C/svg%3E");
+}
+
+/* 🔇 静音（音量 + 叉） */
+.xqmusic .fa-volume-mute,
+.xqmusic-mock .fa-volume-mute {
+    -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 9h3l4-3.5v13L7 15H4zm11.2 1.1 3.3-3.3 1.1 1.1-3.3 3.3 3.3 3.3-1.1 1.1-3.3-3.3-3.3 3.3-1.1-1.1 3.3-3.3-3.3-3.3 1.1-1.1z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 9h3l4-3.5v13L7 15H4zm11.2 1.1 3.3-3.3 1.1 1.1-3.3 3.3 3.3 3.3-1.1 1.1-3.3-3.3-3.3 3.3-1.1-1.1 3.3-3.3-3.3-3.3 1.1-1.1z'/%3E%3C/svg%3E");
+}
+
+/* 🔉 有音量 */
+.xqmusic .fa-volume-down,
+.xqmusic-mock .fa-volume-down {
+    -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 9h3l4-3.5v13L7 15H4zm11.5 3a4 4 0 0 0-2.2-3.6l-.8 1.4a2.4 2.4 0 0 1 0 4.4l.8 1.4a4 4 0 0 0 2.2-3.6z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 9h3l4-3.5v13L7 15H4zm11.5 3a4 4 0 0 0-2.2-3.6l-.8 1.4a2.4 2.4 0 0 1 0 4.4l.8 1.4a4 4 0 0 0 2.2-3.6z'/%3E%3C/svg%3E");
+}
+
+/* 歌词 */
+.xqmusic .fa-file-word,
+.xqmusic-mock .fa-file-word {
+    -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 2h8l5 5v15H6zm7 1.8V8h4.2zM8.5 11h7v1.5h-7zm0 3h7v1.5h-7zm0 3h4.5v1.5H8.5z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 2h8l5 5v15H6zm7 1.8V8h4.2zM8.5 11h7v1.5h-7zm0 3h7v1.5h-7zm0 3h4.5v1.5H8.5z'/%3E%3C/svg%3E");
+}
+
+/* 列表 */
+.xqmusic .fa-list,
+.xqmusic-mock .fa-list {
+    -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 6h2.2v2.2H3zm4 1h14v1.4H7zM3 11h2.2v2.2H3zm4 1h14v1.4H7zM3 16h2.2v2.2H3zm4 1h14v1.4H7z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 6h2.2v2.2H3zm4 1h14v1.4H7zM3 11h2.2v2.2H3zm4 1h14v1.4H7zM3 16h2.2v2.2H3zm4 1h14v1.4H7z'/%3E%3C/svg%3E");
+}

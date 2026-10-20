@@ -1,49 +1,150 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小奇音乐播放器插件</title>
-    <!-- cdn css -->
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <title>测试索引 —— xqmusic-player</title>
+    <link rel="icon" href="./assets/test-icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./assets/icon-shim.css">
+    <link rel="stylesheet" href="./assets/demo.css">
     <link rel="stylesheet" href="../lib/css/xqmusic.min.css">
-    <!-- cdn js -->
-    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.27.2/axios.min.js"></script>
-    <script src="https://xqgj.cc/xqcdn/libs/xqgjs/xqgjs.min.js"></script>
-    <script src="../lib/js/xqmusic.min.js"></script>
 </head>
 <body>
-    <div id="music"></div>
+    <header class="site">
+        <img src="./assets/test-icon.svg" alt="">
+        <h1>xqmusic-player · 测试页索引</h1>
+    </header>
+
+    <nav class="pages">
+        <a href="./index.html" aria-current="page">索引</a>
+        <a href="./umd.html">UMD / 浏览器全局</a>
+        <a href="./esm.html">ESM</a>
+        <a href="./vue3.html">Vue 3</a>
+    </nav>
+
+    <main>
+        <div class="card">
+            <h2>自检结果</h2>
+            <p class="hint">索引页自己也在自检：链接是否可达、提交进仓库的产物是否齐全，最后挂一个可直接播放的实例。</p>
+            <output class="status" id="status" aria-live="polite">检查中…</output>
+            <ul class="checks" id="checks"></ul>
+        </div>
+
+        <div class="card">
+            <h2>可交互实例</h2>
+            <p class="hint">这一页也必须停在「能播」的状态，不能只留一片说明文字。鼠标移到播放器上会整体滑出。</p>
+            <div id="live-demo"></div>
+        </div>
+
+        <div class="card">
+            <h2>全部场景</h2>
+            <ul class="index-list">
+                <li>
+                    <a href="./umd.html">UMD / 浏览器全局</a>
+                    <p>经典 <code>&lt;script&gt;</code> 引入 <code>lib/js/xqmusic.min.js</code>：构造、列表、歌词、切歌、静音、无歌词降级、多实例隔离、destroy 生命周期。</p>
+                </li>
+                <li>
+                    <a href="./esm.html">ESM</a>
+                    <p>真正的 <code>&lt;script type="module"&gt;</code> 导入 <code>lib/js/xqmusic-utils.mjs</code>，并与 UMD 的 <code>XqMusic.utils</code> 逐项对拍。</p>
+                </li>
+                <li>
+                    <a href="./vue3.html">Vue 3</a>
+                    <p>挂载预编译的 <code>lib/vue/xqmusic.vue</code>：props 列表、切歌、歌词面板、静音、卸载清理。</p>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>怎么跑</h2>
+            <p class="hint">
+                这些页面必须经 HTTP 打开（<code>fetch</code> 读 mock 数据，<code>file://</code> 会被浏览器拦截）：
+            </p>
+            <p class="hint"><code>npm run test:browser</code>　然后打开 <code>http://127.0.0.1:4001/</code></p>
+            <p class="hint">
+                每页都会自动执行检查，顶部状态区显示 <strong>PASS / FAIL</strong>，
+                下方始终保留一个可交互的实例。机器可读结果在 <code>window.__TEST_RESULTS__</code>。
+            </p>
+            <p class="hint">
+                想在真实浏览器里一次性跑完四页：<code>node scripts/browser-check.mjs</code>（用本机 Chrome / Edge）。
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>命令行等价物</h2>
+            <p class="hint"><code>npm test</code>　纯函数 / 文件契约 / 桩 DOM 行为（含压缩产物）</p>
+            <p class="hint"><code>npm run build:check</code>　校验提交的 min 产物与源码是否一致</p>
+        </div>
+    </main>
+
+    <script src="./assets/check-runner.js"></script>
+    <script src="./stub/xqgjs-stub.js"></script>
+    <script src="../lib/js/xqmusic.min.js"></script>
     <script>
+        (function () {
+            'use strict';
 
-        // 插件参数
-        let options = {
-            el: '#music',
-            list: [],
-            mode: 'slide', // move/slide
-        },
-        dataUrl = './mock/music.json';
+            var liveInstance = null;
 
-        window.onload = function () {  
-            getList();
-        }
-        
-        
-        // 获取歌曲列表
-        async function getList () {  
-            let data = await axios.get(dataUrl);
-            if (data.status === 200) {
-                options.list = [...data.data];
-                init(options);
+            window.XqDemo.setStatus('pending', '检查中…');
+
+            /** 仅请求头，够判断资源可达即可 */
+            function head(url) {
+                return fetch(url, { method: 'GET' }).then(function (res) {
+                    return { url: url, ok: res.ok, status: res.status };
+                }, function (err) {
+                    return { url: url, ok: false, status: String(err) };
+                });
             }
-        }
 
-        // 初始化参数
-        function init (options) {  
-            new XqMusic(options);
-        }
+            function links() {
+                return Array.prototype.map.call(
+                    document.querySelectorAll('nav.pages a:not([aria-current="page"])'),
+                    function (a) { return a.getAttribute('href'); }
+                );
+            }
 
+            window.XqDemo.check('索引页列出的场景页都能打开', function () {
+                var hrefs = links();
+                return Promise.all(hrefs.map(head)).then(function (rows) {
+                    var bad = rows.filter(function (r) { return !r.ok; });
+                    return {
+                        ok: hrefs.length === 3 && bad.length === 0,
+                        detail: rows.map(function (r) { return r.url + '=' + r.status; }).join(' '),
+                    };
+                });
+            });
+
+            window.XqDemo.check('提交进仓库的产物都在位', function () {
+                var assets = [
+                    '../lib/js/xqmusic.min.js',
+                    '../lib/css/xqmusic.min.css',
+                    '../lib/js/xqmusic-utils.mjs',
+                    './assets/xqmusic-demo.mjs',
+                    './assets/check-runner.js',
+                    './mock/music.json',
+                ];
+                return Promise.all(assets.map(head)).then(function (rows) {
+                    var missing = rows.filter(function (r) { return !r.ok; });
+                    return {
+                        ok: missing.length === 0,
+                        detail: missing.length ? '缺失: ' + missing.map(function (r) { return r.url; }).join(', ') : assets.length + ' 个产物齐全',
+                    };
+                });
+            });
+
+            window.XqDemo.check('索引页挂起一个可播实例', async function () {
+                var songs = await fetch('./mock/music.json').then(function (res) { return res.json(); });
+                liveInstance = new window.XqMusic({ el: '#live-demo', list: songs, mode: 'slide' });
+                var items = document.querySelectorAll('#live-demo .xqmusic-menu-ls li');
+                return { ok: items.length === songs.length && !!liveInstance.xqAudio, detail: 'li=' + items.length };
+            });
+
+            window.XqDemo.report({
+                liveCount: function () {
+                    return document.querySelectorAll('#live-demo .xqmusic').length;
+                },
+            });
+        })();
     </script>
 </body>
 </html>

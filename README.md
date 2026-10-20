@@ -1,32 +1,112 @@
 # xqmusic-player
 
-This is a simplify music player.
+A lightweight music player widget for the browser: play list, cover, progress bar, mute switch and
+scrolling lyrics, shipped as a UMD build plus a Vue 3 component.
 
-[View Chinese documents](./zh.md)
+English | [中文文档](./zh.md)
 
-## use
+## Requirements
 
-### import cdn
+This package is deliberately small, but it does expect two things from the host page:
 
-```html
-<!-- cdn css -->
-<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-<link rel="stylesheet" href="https://xqgj.cc/xqcdn/libs/xqmusic-player/css/xqmusic.min.css">
-<!-- cdn js -->
-<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.27.2/axios.min.js"></script>
-<script src="https://xqgj.cc/xqcdn/libs/xqgjs/xqgjs.min.js"></script>
-<script src="https://xqgj.cc/xqcdn/libs/xqmusic-player/js/xqmusic.min.js"></script>
-```
+| Dependency | Required | Why | How to provide |
+| --- | --- | --- | --- |
+| `$g` global ([xqgjs](https://www.npmjs.com/package/xqgjs)) | **Yes** | used to resolve the host element (`$g.dom`) and to enable drag mode (`$g.Drag`) | `npm i xqgjs`, or load `https://xqgj.cc/xqcdn/libs/xqgjs/xqgjs.min.js` |
+| Font Awesome 6 | Recommended | the rendered markup uses `fa fa-*` classes for every button icon | load `font-awesome/css/all.min.css`, or override `.fa` with your own icons |
+| `fetch` | Recommended | lyrics are fetched with `fetch`; it falls back to a global `axios` only when `fetch` is missing | built into every modern browser |
 
-### use npm
+If `$g` is missing, the constructor throws immediately with `[xqmusic-player] 缺少前置依赖 $g…`
+instead of failing later with a confusing `undefined is not a function`.
+
+## Install
 
 ```sh
-npm i xqmusic-player
+npm i xqmusic-player xqgjs
 ```
 
-### mock
+## Usage in the browser (UMD / global)
 
-`/mock/music.json`:
+```html
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+<link rel="stylesheet" href="node_modules/xqmusic-player/lib/css/xqmusic.min.css">
+
+<div id="music"></div>
+
+<script src="https://xqgj.cc/xqcdn/libs/xqgjs/xqgjs.min.js"></script>
+<script src="node_modules/xqmusic-player/lib/js/xqmusic.min.js"></script>
+<script>
+    new XqMusic({
+        el: '#music',
+        list: [],
+        mode: 'slide', // 'slide' | 'move'
+    });
+</script>
+```
+
+`lib/js/xqmusic.min.js` is the committed build of the readable `lib/js/xqmusic.js`; the two are kept
+byte-comparable by `npm run build:check`, so either one behaves identically.
+
+## Usage as a module
+
+```js
+// CommonJS — works after "npm i xqmusic-player"
+const XqMusic = require('xqmusic-player');
+// XqMusic itself is also exposed as XqMusic.XqMusic / XqMusic.default
+
+// Pure helpers with no DOM dependency, shipped separately as real ESM
+import { escapeHtml, pad2, formatTime, parseLyric, findLyricIndex } from 'xqmusic-player/utils';
+```
+
+```html
+<!-- directly in the browser -->
+<script type="module">
+    import { formatTime } from './node_modules/xqmusic-player/lib/js/xqmusic-utils.mjs';
+    console.log(formatTime(610).m); // 10:10
+</script>
+```
+
+## Vue 3 component
+
+```js
+import { createApp } from 'vue';
+import App from './App.vue';
+import xqMusic from 'xqmusic-player/vue';
+
+createApp(App).use(xqMusic).mount('#app');
+```
+
+```vue
+<template>
+    <xq-music :list="list" />
+</template>
+
+<script setup>
+import { onMounted, ref } from 'vue';
+
+const list = ref([]);
+
+onMounted(async () => {
+    const res = await fetch('/mock/music.json');
+    list.value = await res.json();
+});
+</script>
+```
+
+The plugin registers the component under `xq-music` and `xqMusic`, so both tag styles work.
+You can also import the single file component directly: `import XqMusic from 'xqmusic-player/xqmusic.vue'`.
+
+> **Vue 2 is not supported.** The component uses `<script setup>`, which requires Vue 3 (compiled with
+> `@vue/compiler-sfc` ≥ 3.2). See [`docs/RFC-2.0.0.md`](./docs/RFC-2.0.0.md) for the plan to support both majors.
+
+## Options
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `el` | `string \| Element` | — (**required**) | host element or selector the player is injected into |
+| `list` | `Array` | `[]` | song list, see the schema below |
+| `mode` | `'slide' \| 'move'` | `'slide'` | `slide` parks the player at the bottom-right corner and slides it out on hover; `move` makes it draggable (needs `$g.Drag`) |
+
+### Song schema
 
 ```json
 [
@@ -37,111 +117,87 @@ npm i xqmusic-player
         "pic": "./lrh-mq.jpg",
         "lyric_url": "./lrh-mq.lrc",
         "url": "./lrh-mq.mp3"
-    },
-    {
-        "id": 2,
-        "name": "年少有为",
-        "author": "李荣浩",
-        "pic": "./lrh-nsyw.jpg",
-        "lyric_url": "./lrh-nsyw.lrc",
-        "url": "./lrh-nsyw.mp3"
-    },
-    {
-        "id": 3,
-        "name": "爸爸妈妈",
-        "author": "李荣浩",
-        "pic": "./lrh-bbmm.jpg",
-        "lyric_url": "./lrh-bbmm.lrc",
-        "url": "./lrh-bbmm.mp3"
     }
 ]
 ```
 
-### browser
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `number \| string` | unique within the list; used to highlight the active row |
+| `name` | `string` | title, rendered escaped |
+| `author` | `string` | shown before the title |
+| `pic` | `string` | cover image URL, used as `background-image` |
+| `url` | `string` | audio file URL |
+| `lyric_url` | `string` | optional. When missing the panel renders `暂无歌词` / “No lyrics” |
 
-```html
-<div id="music"></div>
-```
+Both `id` and `name` are HTML-escaped before they reach `innerHTML`, so a song title cannot inject markup.
 
-```js
-// options
-let options = {
-    el: '#music',
-    list: [],
-    mode: 'slide', // move/slide
-},
-dataUrl = '/mock/music.json';
-
-window.onload = function () {  
-    getList();
-}
-
-
-// list
-async function getList () {  
-    let data = await axios.get(dataUrl);
-    if (data.status === 200) {
-        options.list = [...data.data];
-        init(options);
-    }
-}
-
-// initialize
-function init (options) {  
-    new XqMusic(options);
-}
-```
-
-### vue3
+## Public API
 
 ```js
-import xqMusic from 'xqmusic-player/libs/vue/xqmusic';
-const app = createApp(App);
-app.use(xqMusic);
+const player = new XqMusic({ el: '#music', list });
+
+player.playSong();              // play / pause toggle
+player.togglePrevSong();
+player.toggleNextSong();
+player.toggleListSong(event);   // play the row that was clicked
+player.toggleMusic();           // re-render the current song without playing
+player.setMuted(true);          // returns the new muted state
+player.setLyricSource(url);     // switch lyrics source; pass nothing to clear it
+player.getLyric(url);           // returns a Promise<Object|null>
+player.parseLyric(text);        // { ti, ar, al, by, offset, ms: [{ t, c }] }
+player.calcTimeStr(610);        // { h: '00:10:10', m: '10:10' }
+player.destroy();               // unbind every listener, pause the audio, remove the DOM
+
+XqMusic.VERSION;                // '1.2.0'
+XqMusic.utils;                  // { escapeHtml, pad2, formatTime, parseLyric, findLyricIndex }
 ```
 
-```vue
-<template>
-    <div>
-        <xq-music :list="post.list"></xq-music>
-    </div>
-</template>
+Notes on behaviour:
 
-<script setup>
+- **Multiple instances** can live on the same page. Everything is queried inside the player's own root
+  element by class name; the `id` attributes kept in the markup are only there for consumers who
+  relied on `getElementById`.
+- **Lyrics** live in memory first and are mirrored into `localStorage` under a per-instance key
+  (`xqmusic:lyric:<n>`); when a fetch fails they are read back from there. The legacy shared
+  `lyrcis` key (yes, misspelled in older versions) is migrated once and then removed.
+- **Switching songs** cancels any in-flight lyric request, so a slow response can never overwrite the
+  song you just started playing.
+- **`destroy()`** is idempotent. Always call it when you remove the host node, or the `timeupdate`
+  listener keeps running.
 
-import { reactive, getCurrentInstance } from 'vue'
+## Development
 
-const { proxy } = getCurrentInstance();
-
-const demo = reactive({
-    list: [],
-});
-
-onMounted(() => {
-    getMusicList();
-})
-
-async function getMusicList () {  
-    let url = '/mock/music.json';
-    let data = await proxy.$http.get(url);
-    if (data.status === 200) {
-        let list = data.data;
-        if (list && list.length) {
-            demo.list = list;
-        }
-    }
-}
-</script>
+```sh
+npm install
+npm test            # pure helpers, file contracts, stub-DOM behaviour (source + minified build)
+npm run test:harness   # run the stub-DOM scenarios only
+npm run build       # regenerate lib/js/xqmusic.min.js + lib/css/xqmusic.min.css with esbuild
+npm run build:check # fail if the committed artifacts differ from what the build produces
+npm run test:browser   # serve ./test over HTTP for manual checks
+npm run verify:browser # drive the four test pages in your local Chrome / Edge
 ```
 
-### preview
+The four pages under `test/` are self-checking: each one renders `PASS / FAIL` in a live region and
+keeps a working player mounted, so a human sees the same result a machine reads from
+`window.__TEST_RESULTS__`.
 
-![xqlight](https://xqgj.cc/xqmusic-player/test/img/preview.jpg)
+## Preview
 
-## issue
+![preview](./test/img/preview.jpg)
 
-[submit your question](https://github.com/gitguanqi/xqmusic-player/issues/new)
+## Changelog
 
-## author
+See [CHANGELOG.md](./CHANGELOG.md). Breaking-change proposals live in [docs/RFC-2.0.0.md](./docs/RFC-2.0.0.md).
+
+## Issues
+
+[Submit your question](https://github.com/gitguanqi/xqmusic-player/issues/new)
+
+## Author
 
 [@gitguanqi](https://github.com/gitguanqi)
+
+## License
+
+MIT

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue 3 封装 —— xqmusic-player</title>
+    <link rel="icon" href="./assets/test-icon.svg" type="image/svg+xml">
+    <!-- 图标替身：正式用页面里应当引 Font Awesome，但自检页必须能离线跑 -->
+    <link rel="stylesheet" href="./assets/icon-shim.css">
+    <link rel="stylesheet" href="./assets/demo.css">
+    <!-- 故意加载 UMD 版的样式表：验证 Vue 组件的显隐不会被这份 CSS 的 display:none 压掉 -->
+    <link rel="stylesheet" href="../lib/css/xqmusic.css">
+
+    <!--
+        vue 由 scripts/serve.mjs 映射到 node_modules 里的浏览器构建：
+        既不依赖外网 CDN（离线也要能自检），也不往仓库里塞第三方副本。
+    -->
+    <script type="importmap">
+        {
+            "imports": {
+                "vue": "./vendor/vue.esm-browser.prod.js"
+            }
+        }
+    </script>
+</head>
+<body>
+    <header class="site">
+        <img src="./assets/test-icon.svg" alt="">
+        <h1>xqmusic-player · Vue 3 封装</h1>
+    </header>
+
+    <nav class="pages">
+        <a href="./index.html">索引</a>
+        <a href="./umd.html">UMD / 浏览器全局</a>
+        <a href="./esm.html">ESM</a>
+        <a href="./vue3.html" aria-current="page">Vue 3</a>
+    </nav>
+
+    <main>
+        <div class="card">
+            <h2>自检结果</h2>
+            <p class="hint">
+                本页加载的是 <code>lib/vue/xqmusic.vue</code> 经 <code>@vue/compiler-sfc</code> 预编译的产物，
+                不经过任何打包器，因此验证的是**真正要发布的那份 SFC**。
+            </p>
+            <output class="status" id="status" aria-live="polite">检查中…</output>
+            <ul class="checks" id="checks"></ul>
+        </div>
+
+        <div class="card">
+            <h2>可交互 demo</h2>
+            <p class="hint">检查跑完后这里必须仍然是挂载状态。</p>
+            <div id="demo"></div>
+        </div>
+
+        <div class="card">
+            <h2>卸载断言专用挂载点</h2>
+            <p class="hint" id="disposable-hint">一次性实例，断言完即卸载，不影响上面的 demo。</p>
+            <div id="disposable"></div>
+        </div>
+    </main>
+
+    <script src="./assets/check-runner.js"></script>
+    <script type="module">
+        import { createApp } from 'vue';
+        import XqMusic from './assets/xqmusic-demo.mjs';
+
+        window.XqDemo.setStatus('pending', '检查中…');
+
+        const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+        const waitFor = (predicate, timeout = 2000) =>
+            new Promise((resolve, reject) => {
+                const deadline = Date.now() + timeout;
+                (function tick() {
+                    if (predicate()) return resolve(true);
+                    if (Date.now() > deadline) return reject(new Error('等待超时'));
+                    setTimeout(tick, 25);
+                })();
+            });
+
+        let demoApp = null;
+        let songs = [];
+
+        window.XqDemo.check('预编译产物是合法组件', () =>
+            ({ ok: !!XqMusic && typeof XqMusic === 'object', detail: typeof XqMusic }));
+
+        try {
+            const res = await fetch('./mock/music.json');
+            songs = await res.json();
+        } catch (err) {
+            window.XqDemo.check('加载 mock 数据', () => { throw err; });
+            await window.XqDemo.report();
+            throw err;
+        }
+
+        window.XqDemo.check('createApp 挂载成功', async () => {
+            demoApp = createApp({
+                data: () => ({ list: songs }),
+                template: '<XqMusic :list="list" />',
+            });
+            demoApp.component('XqMusic', XqMusic);
+            demoApp.mount('#demo');
+            await sleep(30);
+            const root = document.querySelector('#demo .xqmusic');
+            return { ok: !!root, detail: 'root=' + !!root };
+        });
+
+        window.XqDemo.check('列表渲染 3 项', () => {
+            const items = document.querySelectorAll('#demo .xqmusic-menu-ls li');
+            return { ok: items.length === 3, detail: 'li=' + items.length };
+        });
+
+        window.XqDemo.check('首曲标题正确', () => {
+            const title = document.querySelector('#demo .xqmusic-song-title').textContent.trim();
+            return { ok: title === '甲 - 第一首', detail: title };
+        });
+
+        window.XqDemo.check('列表面板可以真正显示（不被外部 CSS 压回 none）', async () => {
+            document.querySelector('#demo .xqmusic-list').click();
+            await sleep(20);
+            const box = document.querySelector('#demo .xqmusic-menu-ls');
+            const display = getComputedStyle(box).display;
+            return { ok: display === 'block', detail: 'computed display = ' + display };
+        });
+
+        window.XqDemo.check('切歌按钮生效', async () => {
+            document.querySelector('#demo .xqmusic-next').click();
+            await waitFor(() => document.querySelector('#demo .xqmusic-song-title').textContent.trim() === '乙 - 第二首');
+            const title = document.querySelector('#demo .xqmusic-song-title').textContent.trim();
+            return { ok: title === '乙 - 第二首', detail: title };
+        });
+
+        window.XqDemo.check('歌词渲染且面板可显示', async () => {
+            document.querySelector('#demo .xqmusic-word').click();
+            await waitFor(() => document.querySelectorAll('#demo .xqmusic-lyric-ls li').length >= 3);
+            const box = document.querySelector('#demo .xqmusic-lyric-ls');
+            const display = getComputedStyle(box).display;
+            const lines = box.querySelectorAll('li').length;
+            return { ok: display === 'block' && lines === 3, detail: 'display=' + display + ' lines=' + lines };
+        });
+
+        window.XqDemo.check('静音按钮切换图标与真实 muted', async () => {
+            const volBtn = document.querySelector('#demo .xqmusic-volumn');
+            volBtn.click();
+            await sleep(20);
+            const audio = document.querySelector('#demo .xqmusic-audio');
+            const mutedBtnVisible = getComputedStyle(document.querySelector('#demo .xqmusic-muted')).display;
+            const ok = audio.muted === true && mutedBtnVisible === 'block';
+            document.querySelector('#demo .xqmusic-muted').click();
+            await sleep(20);
+            return { ok: ok && audio.muted === false, detail: 'muted=' + audio.muted + ' mutedBtn=' + mutedBtnVisible };
+        });
+
+        window.XqDemo.check('卸载后 DOM 清空（一次性实例）', async () => {
+            const probe = createApp({
+                data: () => ({ list: songs }),
+                template: '<XqMusic :list="list" />',
+            });
+            probe.component('XqMusic', XqMusic);
+            probe.mount('#disposable');
+            await sleep(30);
+            const before = !!document.querySelector('#disposable .xqmusic');
+            probe.unmount();
+            await sleep(20);
+            const after = !!document.querySelector('#disposable .xqmusic');
+            return { ok: before && !after, detail: '挂载=' + before + ' 卸载后残留=' + after };
+        });
+
+        const result = await window.XqDemo.report({
+            remount: () => {
+                // 回到第一首，保证页面停在可播状态
+                const prev = document.querySelector('#demo .xqmusic-prev');
+                if (prev) prev.click();
+            },
+            liveCount: () => document.querySelectorAll('#demo .xqmusic').length,
+        });
+
+        window.__VUE_DEMO_READY__ = result.status === 'passed';
+    </script>
+</body>
+</html>
