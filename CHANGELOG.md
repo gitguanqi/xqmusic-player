@@ -3,6 +3,22 @@
 本项目的所有重要变更都记录在这里，格式参照 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.2.1] - 2026-10-21
+
+示例资源善后版：把仓库里带版权风险的素材换成自制占位件，**运行时代码无改动**，
+从 1.2.0 升级无需改任何调用方式。
+
+### 变更
+
+- `test/img/preview.jpg` 重制为「当前播放器 UI」的真实截图，替换掉原先引用真实专辑封面的旧截图。
+  `README.md` / `zh.md` 的预览图引用路径不变。
+- 新增 `test/img/cover-demo.jpg`：纯 SVG 绘制的自制占位封面（渐变底 + 音符 + 包名），
+  `test/mock/music.json` 三首歌的 `pic` 全部改用它。
+- 示例歌名 / 歌手名统一换成中性占位：示例歌曲一 / 二 / 三、示例歌手A / B / C。
+  同步更新 `song-a.lrc`、`song-b.lrc` 的 `[ti]` / `[ar]` 与歌词文本。
+- 同步更新受命名影响的断言：`test/umd.html`、`test/esm.html`、`test/vue3.html`、`scripts/dom-harness.mjs`。
+- `test/contract.test.mjs` 新增一条断言：占位封面 `test/img/cover-demo.jpg` 必须存在，防止资源再被误删。
+
 ## [1.2.0] - 2026-10-21
 
 这一版把 1.0.8 / 1.1.0 的修复做完了收尾：实例隔离、去重、生命周期与性能。

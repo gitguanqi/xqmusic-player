@@ -151,7 +151,7 @@ player.parseLyric(text);        // { ti, ar, al, by, offset, ms: [{ t, c }] }
 player.calcTimeStr(610);        // { h: '00:10:10', m: '10:10' }
 player.destroy();               // 解绑全部监听、暂停音频、移除 DOM
 
-XqMusic.VERSION;                // '1.2.0'
+XqMusic.VERSION;                // '1.2.1'
 XqMusic.utils;                  // { escapeHtml, pad2, formatTime, parseLyric, findLyricIndex }
 ```
 
