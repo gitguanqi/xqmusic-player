@@ -182,14 +182,16 @@ describe('测试页契约', () => {
         assert.match(html, /from '\.\.\/lib\/js\/xqmusic-utils\.mjs'/);
     });
 
-    it('Vue 页用本地映射的运行时（而非 CDN），版本锁在 devDependencies', () => {
+    it('Vue 页通过 CDN 引入运行时，版本锁在 devDependencies', () => {
         const html = read('test/vue3.html');
-        assert.match(html, /"vue": "\.\/vendor\/vue\.esm-browser\.prod\.js"/);
+        assert.match(html, /"vue": "https:\/\/(unpkg\.com|cdn\.bootcdn\.net|registry\.npmmirror\.com)\/[^"]*vue@3\.\d+\.\d+[^"]*vue\.esm-browser\.prod\.js"/);
         assert.match(html, /from '\.\/assets\/xqmusic-demo\.mjs'/);
         assert.match(html, /type="importmap"/);
-        // 版本锁在 devDependencies，不再由页面里的 CDN 地址决定
+        // 版本锁在 devDependencies，页面 CDN 地址必须与之一致
         const pkg = JSON.parse(read('package.json'));
         assert.match(pkg.devDependencies.vue, /^[\^~]?3\.\d+\.\d+$/, 'vue 必须锁到具体版本');
+        const locked = pkg.devDependencies.vue.replace(/^[\^~]/, '');
+        assert.ok(html.includes(`vue@${locked}/`) || html.includes(`vue/${locked}/`), `页面 CDN 版本必须与 devDependencies 的 ${locked} 一致`);
     });
 
     it('页面不依赖第三方 CDN 上的 $g', () => {

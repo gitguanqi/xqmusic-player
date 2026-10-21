@@ -32,8 +32,14 @@
 
         <div class="card">
             <h2>可交互实例</h2>
-            <p class="hint">这一页也必须停在「能播」的状态，不能只留一片说明文字。鼠标移到播放器上会整体滑出。</p>
+            <p class="hint">这一页也必须停在「能播」的状态，不能只留一片说明文字。</p>
             <div id="live-demo"></div>
+        </div>
+
+        <div class="card">
+            <h2>slide 模式</h2>
+            <p class="hint">停靠在屏幕右侧（position:fixed），鼠标移过去会整体滑出。</p>
+            <div id="slide-demo"></div>
         </div>
 
         <div class="card">
@@ -84,6 +90,8 @@
             'use strict';
 
             var liveInstance = null;
+            var slideInstance = null;
+            var pageSongs = [];
 
             window.XqDemo.setStatus('pending', '检查中…');
 
@@ -133,10 +141,17 @@
             });
 
             window.XqDemo.check('索引页挂起一个可播实例', async function () {
-                var songs = await fetch('./mock/music.json').then(function (res) { return res.json(); });
-                liveInstance = new window.XqMusic({ el: '#live-demo', list: songs, mode: 'slide' });
+                pageSongs = await fetch('./mock/music.json').then(function (res) { return res.json(); });
+                liveInstance = new window.XqMusic({ el: '#live-demo', list: pageSongs });
                 var items = document.querySelectorAll('#live-demo .xqmusic-menu-ls li');
-                return { ok: items.length === songs.length && !!liveInstance.xqAudio, detail: 'li=' + items.length };
+                var visible = document.querySelector('#live-demo .xqmusic').getBoundingClientRect().width > 0;
+                return { ok: items.length === pageSongs.length && !!liveInstance.xqAudio && visible, detail: 'li=' + items.length + ' 可见=' + visible };
+            });
+
+            window.XqDemo.check('slide 模式实例就位（停靠屏幕右侧）', function () {
+                slideInstance = new window.XqMusic({ el: '#slide-demo', list: pageSongs, mode: 'slide' });
+                var root = document.querySelector('#slide-demo .xqmusic');
+                return { ok: !!root && root.classList.contains('slide'), detail: 'slide=' + root.classList.contains('slide') };
             });
 
             window.XqDemo.report({

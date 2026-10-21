@@ -100,9 +100,9 @@
                 songs = list;
 
                 window.XqDemo.check('构造时注入骨架并解析宿主', function () {
-                    demoInstance = new window.XqMusic({ el: '#demo', list: songs, mode: 'slide' });
+                    demoInstance = new window.XqMusic({ el: '#demo', list: songs });
                     var root = host('demo').querySelector('.xqmusic');
-                    return { ok: !!root && root.classList.contains('slide'), detail: 'root=' + !!root };
+                    return { ok: !!root && !root.classList.contains('slide'), detail: 'root=' + !!root + ' 默认静态模式' };
                 });
 
                 window.XqDemo.check('列表渲染 3 首', function () {

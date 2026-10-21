@@ -54,38 +54,12 @@ function resolvePath(urlPath) {
     return target;
 }
 
-/**
- * 第三方运行时别名：测试页要用到 Vue 浏览器构建，但不应该在仓库里塞一份二进制副本，
- * 也不应该依赖外网 CDN（离线就跑不了自检）。这里把它映射到 node_modules 里的那份。
- * 注意这是唯一一处刻意允许访问 node_modules 的路径，白名单写死，不走通用解析。
- */
-const NODE_MODULES_ALIAS = {
-    '/test/vendor/vue.esm-browser.prod.js': 'vue/dist/vue.esm-browser.prod.js',
-    '/test/vendor/vue.esm-browser.js': 'vue/dist/vue.esm-browser.js',
-};
-
 const server = createServer((req, res) => {
     const urlPath = req.url || '/';
 
     if (urlPath === '/' || urlPath === '') {
         res.writeHead(302, { Location: '/test/' });
         res.end();
-        return;
-    }
-
-    const alias = NODE_MODULES_ALIAS[urlPath.split('?')[0]];
-    if (alias) {
-        const aliased = path.resolve(root, 'node_modules', alias);
-        if (!existsSync(aliased)) {
-            res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-            res.end('404 缺少依赖，请先执行 npm install：' + alias);
-            return;
-        }
-        res.writeHead(200, {
-            'Content-Type': MIME['.mjs'],
-            'Cache-Control': 'no-store',
-        });
-        createReadStream(aliased).pipe(res);
         return;
     }
 

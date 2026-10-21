@@ -12,13 +12,14 @@
     <link rel="stylesheet" href="../lib/css/xqmusic.css">
 
     <!--
-        vue 由 scripts/serve.mjs 映射到 node_modules 里的浏览器构建：
-        既不依赖外网 CDN（离线也要能自检），也不往仓库里塞第三方副本。
+        vue 走 CDN（锁死版本）：与 README 推荐的引入方式保持一致，
+        importmap 把裸模块名 'vue' 解析到浏览器构建。
+        注意：jsdelivr 在国内网络时常被重置，这里用 Vue 官方文档惯用的 unpkg。
     -->
     <script type="importmap">
         {
             "imports": {
-                "vue": "./vendor/vue.esm-browser.prod.js"
+                "vue": "https://unpkg.com/vue@3.5.13/dist/vue.esm-browser.prod.js"
             }
         }
     </script>
