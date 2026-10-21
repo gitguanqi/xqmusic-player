@@ -178,7 +178,8 @@
 }
 
 .xqmusic-img {
-    width: 65px;
+    flex: none;
+    width: 63px;
     height: 100%;
     background: #333;
     overflow: hidden;
@@ -202,10 +203,14 @@
 
 .xqmusic-main {
     flex: 1;
+    min-width: 0;
     height: 100%;
     box-sizing: border-box;
-    /* 上下留出呼吸空间，左右与封面、屏幕边缘保持距离 */
-    padding: 6px 10px 4px;
+    /* 三行内容在可用高度内均匀分布，不再挤在一起或被裁切 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3px 10px 2px;
 }
 
 /* 歌曲标题 */
@@ -214,12 +219,15 @@
     box-sizing: border-box;
     padding-left: 2px;
     font-size: 14px;
+    line-height: 18px;
 }
 
 .xqmusic-title small {
     display: inline-block;
     width: auto;
     max-width: 100%;
+    line-height: 18px;
+    vertical-align: top;
 }
 
 /* 歌曲进度条 */
@@ -264,6 +272,9 @@
 
 .xqmusic-btns button {
     cursor: pointer;
+    /* 显式收口按钮盒：浏览器默认 padding 会把按钮行顶到溢出 */
+    padding: 1px 4px;
+    line-height: 1;
 }
 
 .xqmusic-btns button i {
