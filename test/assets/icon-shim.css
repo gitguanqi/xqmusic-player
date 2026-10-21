@@ -26,11 +26,13 @@
     mask-size: contain;
 }
 
-/* ▶ 播放 */
+/* ▶ 播放
+ * viewBox 以三角形自身的中心（x=13.5, y=12）对称外扩，
+ * mask-position:center 对准的就是三角形的视觉中心，同时保持原来的尺寸比例。 */
 .xqmusic .fa-play,
 .xqmusic-mock .fa-play {
-    -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E");
-    mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='3.5 0 20 24'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='3.5 0 20 24'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E");
 }
 
 /* ❙❙ 暂停 */

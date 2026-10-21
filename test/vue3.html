@@ -168,6 +168,23 @@
             return { ok: before && !after, detail: '挂载=' + before + ' 卸载后残留=' + after };
         });
 
+        window.XqDemo.check('收尾：歌词与列表面板回到关闭态（默认不展开）', async () => {
+            const root = document.querySelector('#demo .xqmusic');
+            // 前面的检查点过歌词/列表按钮，这里必须恢复成组件的默认状态。
+            // Vue 的 DOM 更新是异步批处理，点击后要等一拍再读结果。
+            if (getComputedStyle(root.querySelector('.xqmusic-lyric-ls')).display !== 'none') {
+                root.querySelector('.xqmusic-word').click();
+                await sleep(30);
+            }
+            if (getComputedStyle(root.querySelector('.xqmusic-menu-ls')).display !== 'none') {
+                root.querySelector('.xqmusic-list').click();
+                await sleep(30);
+            }
+            const lrc = getComputedStyle(root.querySelector('.xqmusic-lyric-ls')).display;
+            const lst = getComputedStyle(root.querySelector('.xqmusic-menu-ls')).display;
+            return { ok: lrc === 'none' && lst === 'none', detail: 'lyric=' + lrc + ' list=' + lst };
+        });
+
         const result = await window.XqDemo.report({
             remount: () => {
                 // 回到第一首，保证页面停在可播状态
