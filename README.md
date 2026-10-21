@@ -174,6 +174,8 @@ npm test            # pure helpers, file contracts, stub-DOM behaviour (source +
 npm run test:harness   # run the stub-DOM scenarios only
 npm run build       # regenerate lib/js/xqmusic.min.js + lib/css/xqmusic.min.css with esbuild
 npm run build:check # fail if the committed artifacts differ from what the build produces
+npm run build:demo     # precompile lib/vue/xqmusic.vue for test/vue3.html
+npm run build:fixtures # regenerate test/mock/tone.wav (generated asset, not committed)
 npm run test:browser   # serve ./test over HTTP for manual checks
 npm run verify:browser # drive the four test pages in your local Chrome / Edge
 ```

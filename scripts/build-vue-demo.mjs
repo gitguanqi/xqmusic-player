@@ -4,8 +4,8 @@
  * 为什么需要这一步：SFC 里的 <script setup> 必须经过编译器处理才能在浏览器里执行。
  * 测试页不引入打包器，所以用 @vue/compiler-sfc 在仓库里预编译一份产物。
  *
- * 产物 test/assets/xqmusic-demo.mjs 会被提交；contract 测试会重新编译并与它对比，
- * 防止「改了 SFC 忘了重新生成」。
+ * 产物 test/assets/xqmusic-demo.mjs 是生成物（已 gitignore），由 pretest 重新生成；
+ * contract 测试会再编译一次并与它对比，防止「改了 SFC 忘了重新生成」。
  *
  * 用法：node scripts/build-vue-demo.mjs
  */

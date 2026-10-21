@@ -15,6 +15,14 @@ pnpm-debug.log*
 # Editor directories and files
 .idea
 .vscode
+
+# 本地会话记录与构建临时目录，只在本机存在，不应进入版本库 / 远端
+.workbuddy
+.build-check
+
+# 测试用的生成物：由 npm run build:fixtures / build:demo 重新生成
+test/mock/tone.wav
+test/assets/xqmusic-demo.mjs
 *.suo
 *.ntvs*
 *.njsproj
