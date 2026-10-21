@@ -113,7 +113,7 @@
                 window.XqDemo.check('首曲标题与封面已应用', function () {
                     var title = host('demo').querySelector('.xqmusic-song-title').textContent;
                     var cover = host('demo').querySelector('.xqmusic-cover-img').style.backgroundImage;
-                    return { ok: title === '甲 - 第一首' && cover.indexOf('preview.jpg') >= 0, detail: title + ' | ' + cover };
+                    return { ok: title === '示例歌手A - 示例歌曲一' && cover.indexOf('cover-demo.jpg') >= 0, detail: title + ' | ' + cover };
                 });
 
                 window.XqDemo.check('播放不抛错（currentTime 为 0 的历史崩溃点）', async function () {
@@ -134,16 +134,16 @@
                 window.XqDemo.check('切歌后标题与歌词都切换', async function () {
                     demoInstance.toggleNextSong();
                     await waitFor(function () {
-                        return host('demo').querySelector('.xqmusic-song-title').textContent === '乙 - 第二首';
+                        return host('demo').querySelector('.xqmusic-song-title').textContent === '示例歌手B - 示例歌曲二';
                     });
-                    // 歌词是异步拉的：等到第二首的第一行真的出现，而不是读完标题就断言
+                    // 歌词是异步拉的：等到示例歌曲二的第一行真的出现，而不是读完标题就断言
                     await waitFor(function () {
                         var li = host('demo').querySelector('.xqmusic-lyric-ls li');
-                        return li && li.textContent === '第二首的第一行';
+                        return li && li.textContent === '示例歌曲二的第一行';
                     });
                     var title = host('demo').querySelector('.xqmusic-song-title').textContent;
                     var first = host('demo').querySelector('.xqmusic-lyric-ls li');
-                    return { ok: title === '乙 - 第二首' && first.textContent === '第二首的第一行', detail: title + ' | ' + first.textContent };
+                    return { ok: title === '示例歌手B - 示例歌曲二' && first.textContent === '示例歌曲二的第一行', detail: title + ' | ' + first.textContent };
                 });
 
                 window.XqDemo.check('无歌词歌曲降级为空态且不抛错', async function () {

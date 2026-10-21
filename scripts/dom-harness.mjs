@@ -30,9 +30,9 @@ const SAMPLE_LRC = [
 ].join('\n');
 
 const SAMPLE_LIST = [
-    { id: 1, name: '第一首', author: '甲', pic: './a.jpg', url: './a.mp3', lyric_url: './a.lrc' },
-    { id: 2, name: '第二首', author: '乙', pic: './b.jpg', url: './b.mp3', lyric_url: './b.lrc' },
-    { id: 3, name: '第三首', author: '丙', pic: './c.jpg', url: './c.mp3' }, // 故意没有歌词
+    { id: 1, name: '示例歌曲一', author: '示例歌手A', pic: './a.jpg', url: './a.mp3', lyric_url: './a.lrc' },
+    { id: 2, name: '示例歌曲二', author: '示例歌手B', pic: './b.jpg', url: './b.mp3', lyric_url: './b.lrc' },
+    { id: 3, name: '示例歌曲三', author: '示例歌手C', pic: './c.jpg', url: './c.mp3' }, // 故意没有歌词
 ];
 
 /**
@@ -143,7 +143,7 @@ const SCENARIOS = {
             ok: !!rootEl
                 && rootEl.classList.contains('slide')
                 && items.length === 3
-                && title === '甲 - 第一首'
+                && title === '示例歌手A - 示例歌曲一'
                 && cover.includes('a.jpg'),
             detail: `root=${!!rootEl} items=${items.length} title="${title}" cover="${cover}"`,
         };
@@ -341,8 +341,8 @@ const SCENARIOS = {
         const mutedB = b.xqMuted.classList.contains('active');
 
         return {
-            ok: titleA === '乙 - 第二首'
-                && titleB === '甲 - 第一首'
+            ok: titleA === '示例歌手B - 示例歌曲二'
+                && titleB === '示例歌手A - 示例歌曲一'
                 && lyricA === lyricB
                 && mutedA === true
                 && mutedB === false,

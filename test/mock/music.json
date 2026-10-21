@@ -1,25 +1,25 @@
 [
     {
         "id": 1,
-        "name": "第一首",
-        "author": "甲",
-        "pic": "./img/preview.jpg",
+        "name": "示例歌曲一",
+        "author": "示例歌手A",
+        "pic": "./img/cover-demo.jpg",
         "lyric_url": "./mock/song-a.lrc",
         "url": "./mock/tone.wav"
     },
     {
         "id": 2,
-        "name": "第二首",
-        "author": "乙",
-        "pic": "./img/preview.jpg",
+        "name": "示例歌曲二",
+        "author": "示例歌手B",
+        "pic": "./img/cover-demo.jpg",
         "lyric_url": "./mock/song-b.lrc",
         "url": "./mock/tone.wav"
     },
     {
         "id": 3,
-        "name": "没有歌词的歌",
-        "author": "丙",
-        "pic": "./img/preview.jpg",
+        "name": "示例歌曲三",
+        "author": "示例歌手C",
+        "pic": "./img/cover-demo.jpg",
         "url": "./mock/tone.wav"
     }
 ]

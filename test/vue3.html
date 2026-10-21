@@ -114,7 +114,7 @@
 
         window.XqDemo.check('首曲标题正确', () => {
             const title = document.querySelector('#demo .xqmusic-song-title').textContent.trim();
-            return { ok: title === '甲 - 第一首', detail: title };
+            return { ok: title === '示例歌手A - 示例歌曲一', detail: title };
         });
 
         window.XqDemo.check('列表面板可以真正显示（不被外部 CSS 压回 none）', async () => {
@@ -127,9 +127,9 @@
 
         window.XqDemo.check('切歌按钮生效', async () => {
             document.querySelector('#demo .xqmusic-next').click();
-            await waitFor(() => document.querySelector('#demo .xqmusic-song-title').textContent.trim() === '乙 - 第二首');
+            await waitFor(() => document.querySelector('#demo .xqmusic-song-title').textContent.trim() === '示例歌手B - 示例歌曲二');
             const title = document.querySelector('#demo .xqmusic-song-title').textContent.trim();
-            return { ok: title === '乙 - 第二首', detail: title };
+            return { ok: title === '示例歌手B - 示例歌曲二', detail: title };
         });
 
         window.XqDemo.check('歌词渲染且面板可显示', async () => {

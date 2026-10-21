@@ -281,6 +281,7 @@ describe('文档', () => {
         assert.match(read('README.md'), /!\[preview\]\(\.\/test\/img\/preview\.jpg\)/);
         assert.match(read('zh.md'), /!\[preview\]\(\.\/test\/img\/preview\.jpg\)/);
         assert.ok(existsSync(path.join(root, 'test/img/preview.jpg')));
+        assert.ok(existsSync(path.join(root, 'test/img/cover-demo.jpg')), 'mock 数据引用的占位封面必须存在');
         for (const doc of docs) {
             assert.doesNotMatch(read(doc), /xqgj\.cc\/xqmusic-player\/test\//);
         }
