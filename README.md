@@ -149,7 +149,7 @@ player.parseLyric(text);        // { ti, ar, al, by, offset, ms: [{ t, c }] }
 player.calcTimeStr(610);        // { h: '00:10:10', m: '10:10' }
 player.destroy();               // unbind every listener, pause the audio, remove the DOM
 
-XqMusic.VERSION;                // '1.2.1'
+XqMusic.VERSION;                // '1.3.0'
 XqMusic.utils;                  // { escapeHtml, pad2, formatTime, parseLyric, findLyricIndex }
 ```
 
@@ -165,6 +165,13 @@ Notes on behaviour:
   song you just started playing.
 - **`destroy()`** is idempotent. Always call it when you remove the host node, or the `timeupdate`
   listener keeps running.
+
+## For AI agents
+
+`llms.txt` is the compact API reference (entries, options, song schema, constraints);
+`skills/xqmusic-player/SKILL.md` is a portable integration skill covering entry selection, load order
+and the error messages this package throws. Both ship in the npm tarball and are wired through the
+`llms` / `agents` fields of `package.json`.
 
 ## Development
 

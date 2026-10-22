@@ -151,7 +151,7 @@ player.parseLyric(text);        // { ti, ar, al, by, offset, ms: [{ t, c }] }
 player.calcTimeStr(610);        // { h: '00:10:10', m: '10:10' }
 player.destroy();               // 解绑全部监听、暂停音频、移除 DOM
 
-XqMusic.VERSION;                // '1.2.1'
+XqMusic.VERSION;                // '1.3.0'
 XqMusic.utils;                  // { escapeHtml, pad2, formatTime, parseLyric, findLyricIndex }
 ```
 
@@ -163,6 +163,12 @@ XqMusic.utils;                  // { escapeHtml, pad2, formatTime, parseLyric, f
   请求失败时从这里回读。旧版本那个全局共享键 `lyrcis`（是的，当年拼错了）会被迁移一次然后删除。
 - **切歌**会作废正在飞的歌词请求，慢响应不会覆盖当前播放的歌。
 - **`destroy()`** 是幂等的。移除宿主节点前务必调用，否则 `timeupdate` 监听会一直跑。
+
+## 给 AI 代理
+
+`llms.txt` 是精简版 API 速查（入口、选项、歌曲字段、硬约束）；`skills/xqmusic-player/SKILL.md`
+是可移植的接入技能，讲入口怎么选、加载顺序以及几种会直接抛错的报错。两者都随 npm 包发布，
+由 `package.json` 的 `llms` / `agents` 字段指向。
 
 ## 开发
 

@@ -3,6 +3,26 @@
 本项目的所有重要变更都记录在这里，格式参照 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.3.0] - 2026-10-22
+
+给 AI 编码代理（agent）的接入元数据，**运行时代码无改动**，1.2.1 的调用方式全部照旧。
+
+### 新增
+
+- `llms.txt`：面向 agent 的包级速查——入口、导出、`el` / `list` / `mode` 选项、歌曲字段、典型用例，
+  以及 `$g` / Font Awesome / `fetch` / Vue 3 这几条隐藏约束。
+- `skills/xqmusic-player/SKILL.md`：便携技能，讲入口选择、加载顺序、SPA 生命周期与常见报错对照；
+  详细方法表、样式钩子与已知限制放在 `skills/xqmusic-player/references/api.md`，随包一起发布。
+- `package.json` 新增 `llms` / `agents` 字段，并把 `llms.txt`、`skills` 加进 `files` 白名单，
+  保证两个元数据文件真的进 npm 包。
+- `test/agent-metadata.test.mjs`：校验元数据字段指向真实文件、白名单覆盖、`llms.txt` 覆盖全部公开 API 名称、
+  技能 frontmatter 合法且引用文件存在、无 TODO 占位。
+
+### 说明
+
+- 版本号从 1.2.1 升到 1.3.0：没有 API 变化，但包内容新增了对外发布的文件，按语义化版本走 minor。
+- 新增测试已并入 `npm test`。
+
 ## [1.2.1] - 2026-10-21
 
 示例资源善后版：把仓库里带版权风险的素材换成自制占位件，**运行时代码无改动**，

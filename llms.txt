@@ -1,0 +1,161 @@
+# xqmusic-player
+
+Browser music player widget (playlist, cover, progress bar, mute toggle, scrolling LRC lyrics),
+shipped as a dependency-light UMD single file for `<script>` pages plus a Vue 3 single-file component.
+
+## Install
+
+```sh
+npm i xqmusic-player xqgjs
+```
+
+## Imports
+
+```js
+// UMD / CommonJS — the module itself is the constructor
+const XqMusic = require('xqmusic-player');
+// XqMusic === XqMusic.XqMusic === XqMusic.default
+
+// DOM-free pure helpers (real ESM, no $g needed)
+import { escapeHtml, pad2, formatTime, parseLyric, findLyricIndex } from 'xqmusic-player/utils';
+
+// Vue 3 plugin (registers xq-music and xqMusic)
+import xqMusic from 'xqmusic-player/vue';
+// or the raw SFC
+import XqMusicSfc from 'xqmusic-player/xqmusic.vue';
+```
+
+```html
+<!-- classic script: global `XqMusic` + window.XqMusic -->
+<link rel="stylesheet" href="node_modules/xqmusic-player/lib/css/xqmusic.min.css">
+<script src="node_modules/xqmusic-player/lib/js/xqmusic.min.js"></script>
+```
+
+Stylesheet path without a bundler: `xqmusic-player/lib/css/xqmusic.css` (or `.min.css`).
+The Vue component imports `lib/css/xqmusic.css` itself, so a bundler needs no extra CSS import.
+
+## Exported API
+
+- `new XqMusic(options): XqMusicInstance`
+  Injects the player markup into `options.el`. Throws `[xqmusic-player] options.el 是必填项` when
+  `el` is missing, `[xqmusic-player] 找不到宿主元素: …` when the selector matches nothing, and
+  `[xqmusic-player] 缺少前置依赖 $g…` when the `$g` global (xqgjs) is absent.
+- `XqMusic.VERSION: string`
+  Currently `'1.3.0'`.
+- `XqMusic.utils: { escapeHtml, pad2, formatTime, parseLyric, findLyricIndex }`
+  Same functions as the ESM `xqmusic-player/utils` entry.
+- `escapeHtml(value): string`, `pad2(value): string`
+- `formatTime(second): { h: 'HH:MM:SS', m: 'MM:SS' }`
+- `parseLyric(text): { ti, ar, al, by, offset, ms: Array<{ t: number, c: string }> }`
+  LRC parser. `ms` is sorted by `t`. Empty or non-string input returns `{ ms: [] }`, never `undefined`.
+- `findLyricIndex(list, time): number`
+  Binary search for the last line whose `t <= time`; `-1` when nothing matches.
+- `default export of xqmusic-player/vue`: `{ version: '1.3.0', component, install(app) }`
+  `install` registers the component as both `xq-music` and `xqMusic`.
+
+### Instance methods
+
+```js
+const player = new XqMusic({ el: '#music', list, mode: 'slide' });
+
+player.playSong();            // play / pause toggle (autoplay rejection is swallowed)
+player.togglePrevSong();      // previous song, wraps to the end
+player.toggleNextSong();      // next song, wraps to the start
+player.toggleMusic();         // re-render current song, reset progress, pause
+player.toggleListSong(event); // event-delegated playlist click handler
+player.setMuted(true);        // only mute entry point; returns the new muted state
+player.setLyricSource(url);   // Promise<Object|null>, pass nothing to clear the panel
+player.getLyric(url);         // Promise<Object|null>, falls back to the localStorage cache
+player.parseLyric(text);      // instance-level parseLyric
+player.calcTimeStr(610);      // { h: '00:10:10', m: '10:10' }
+player.destroy();             // idempotent teardown: unbind, pause, clear src, remove DOM
+```
+
+Deprecated, kept for compatibility and semantically inverted by name: `showMuted()` unmutes,
+`showVolumn()` mutes. Prefer `setMuted(boolean)`.
+
+Readable state: `songList`, `currentIndex`, `playStatus`, `lyricData`, `instanceId`, `version`
+(`'v1.3.0'`), `pluginName` (`'XQMusicPlayer'`).
+
+## Key Options
+
+- `el` — **required**. CSS selector string or `Element` the player is injected into.
+- `list` — `Array`, default `[]`. Song list, see schema below. With an empty list the player still
+  renders the shell but binds no interaction handlers.
+- `mode` — `'slide' | 'move'`, default `'slide'`. `slide` parks the player in the bottom-right corner
+  and slides it out on hover; `move` makes it draggable and requires `$g.Drag` from xqgjs.
+
+### Song schema
+
+```json
+{
+  "id": 1,
+  "name": "Track One",
+  "author": "Artist A",
+  "pic": "./cover.jpg",
+  "url": "./track.mp3",
+  "lyric_url": "./track.lrc"
+}
+```
+
+- `id` (`number | string`, unique) — used to highlight the active row; compared as strings.
+- `name`, `author` — rendered via `escapeHtml`, safe inside `innerHTML`.
+- `pic` — cover URL, applied as `background-image`.
+- `url` — audio URL for the `<audio>` element.
+- `lyric_url` — optional. Without it the lyric panel shows `暂无歌词`.
+
+### Vue component
+
+`<xq-music :list="list" mode="slide" />` — props `list` (Array, default `[]`) and `mode`
+(String, default `'slide'`). No events, no slots. The component fetches `lyric_url` itself with
+`fetch`, needs no `$g`, and copies `list` by value, so mutating the prop array after mount is not
+reactive — replace the array instead.
+
+## Typical Use
+
+```html
+<div id="music"></div>
+<script src="https://cdn.jsdelivr.net/npm/xqgjs/lib/xqgjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xqmusic-player/lib/js/xqmusic.min.js"></script>
+<script>
+    const player = new XqMusic({
+        el: '#music',
+        mode: 'slide',
+        list: [
+            { id: 1, name: 'Track One', author: 'Artist A', pic: './cover.jpg', url: './track.mp3', lyric_url: './track.lrc' },
+        ],
+    });
+</script>
+```
+
+```js
+// Vue 3
+import { createApp } from 'vue';
+import xqMusic from 'xqmusic-player/vue';
+import 'xqmusic-player/lib/css/xqmusic.css';
+
+createApp(App).use(xqMusic).mount('#app');
+```
+
+## Constraints
+
+- **`$g` global is required for the UMD constructor** (`xqgjs`, `>=1.1.0`). It is a declared optional
+  peer dependency but the runtime throws without it, because `$g.dom` resolves the host element.
+  The Vue component has no `$g` dependency.
+- **Font Awesome 6 is expected for icons.** The markup uses `fa fa-play`, `fa fa-pause`, etc.; without
+  the stylesheet the buttons render empty. Override `.fa` to supply your own glyphs.
+- **Lyrics are fetched with `fetch(url, { credentials: 'same-origin' })`**, falling back to a global
+  `axios` only when `fetch` is unavailable. Cross-origin lyrics need CORS enabled, otherwise the call
+  fails and the cached or `暂无歌词` state is shown.
+- **Vue 3 only.** The component uses `<script setup>`; Vue 2 cannot compile it.
+- **Styles are scoped to `.xqmusic`** and ship separately for the UMD path — load
+  `lib/css/xqmusic.css` (or `.min.css`) or the player is unstyled.
+- **Lyric cache** lives in `localStorage` under a per-instance key `xqmusic:lyric:<n>`. The legacy
+  shared `lyrcis` key is migrated once and then deleted. In private-mode Safari the cache silently
+  degrades to memory.
+- **Multiple instances per page are supported** — all lookups are scoped to the instance root and use
+  class selectors. DOM `id`s (`xqmusic-audio`, …) are kept only for consumers using
+  `getElementById`, so they repeat across instances.
+- **Always call `destroy()`** before removing the host node in an SPA; `destroy()` is idempotent and
+  also drops that instance's lyric cache.
+- Theme is controlled by CSS variables/selectors in `lib/css/xqmusic.css`; no JS theming option exists.
