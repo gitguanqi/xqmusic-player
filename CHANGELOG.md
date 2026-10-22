@@ -3,6 +3,27 @@
 本项目的所有重要变更都记录在这里，格式参照 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.4.1] - 2026-10-22
+
+补齐提交环节的工程化约束：commit message 规范化、提交前钩子。**运行时代码与公开 API 无改动**，
+1.4.0 的调用方式完全不变；本次变更只影响仓库开发流程，不打进 npm 包（`files` 白名单未含这些文件）。
+
+### 新增
+
+- `commitlint.config.mjs`：基于 `@commitlint/config-conventional`，并在其基础上把 `type-enum`
+  收敛为本仓库实际使用的 11 种类型（`feat` `fix` `docs` `style` `refactor` `perf` `test` `build`
+  `ci` `revert` `chore`），使 `chore(release): …` 这类提交也合法。
+- `.husky/commit-msg`：调用 `npx --no-install commitlint --edit "$1"`，不合规的提交信息直接拒绝。
+- `.husky/pre-commit`：调用 `npx --no-install lint-staged`，只处理暂存区的文件。
+- `lint-staged.config.mjs`：当前仓库没有 ESLint / Biome / oxlint 依赖，配置保留为占位形态
+  （`'*': []`）。装上其中任意一个 linter 后，把这一项换成对应命令即可生效，无需改钩子。
+- `package.json` 新增脚本：`commitlint`（手动校验一条提交信息）、`prepare`（`husky`，
+  `npm install` 后自动注册钩子，保证新克隆的仓库也能直接拦截）。
+
+### 开发依赖
+
+- 新增 `@commitlint/cli`、`@commitlint/config-conventional`、`husky`、`lint-staged`（均为 devDependencies）。
+
 ## [1.4.0] - 2026-10-22
 
 把 1.3.0 的代理元数据补齐成完整的一套：技能目录补上 agent 描述文件，`llms.txt` 补上分层出口，

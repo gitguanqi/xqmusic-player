@@ -14,6 +14,9 @@ lib/css/xqmusic.min.css    text eol=lf
 *.html    text eol=lf
 *.lrc     text eol=lf
 
+# husky 钩子是 shell 脚本，必须 LF：CRLF 会让 POSIX 上的 sh 报 bad interpreter
+.husky/*   text eol=lf
+
 # 二进制素材，别当文本处理
 *.jpg     binary
 *.png     binary

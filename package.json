@@ -1,6 +1,6 @@
 {
   "name": "xqmusic-player",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A lightweight, dependency-light music player widget for the browser (UMD + Vue 3).",
   "type": "commonjs",
   "main": "lib/js/xqmusic.js",
@@ -40,7 +40,9 @@
     "test:browser": "node scripts/serve.mjs",
     "preverify:browser": "node scripts/build-fixtures.mjs && node scripts/build-vue-demo.mjs",
     "verify:browser": "node scripts/browser-check.mjs",
-    "prepublishOnly": "npm run build:check && npm test"
+    "prepublishOnly": "npm run build:check && npm test",
+    "commitlint": "commitlint --edit",
+    "prepare": "husky"
   },
   "peerDependencies": {
     "vue": ">=3.2.0",
@@ -74,9 +76,13 @@
   },
   "homepage": "https://github.com/gitguanqi/xqmusic-player#readme",
   "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@vue/compiler-sfc": "^3.5.13",
     "esbuild": "^0.25.10",
+    "husky": "^9.1.7",
     "jsdom": "^26.1.0",
+    "lint-staged": "^17.6.0",
     "playwright-core": "^1.55.0",
     "vue": "^3.5.13"
   }

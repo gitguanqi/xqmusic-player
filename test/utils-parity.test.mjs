@@ -31,7 +31,7 @@ describe('UMD 构建的导出形态', () => {
 
     it('暴露版本号与纯函数工具', () => {
         for (const [name, build] of IMPLEMENTATIONS) {
-            assert.equal(build.VERSION, '1.4.0', `${name} 的 VERSION`);
+            assert.equal(build.VERSION, '1.4.1', `${name} 的 VERSION`);
             for (const key of ['escapeHtml', 'pad2', 'formatTime', 'parseLyric', 'findLyricIndex']) {
                 assert.equal(typeof build.utils[key], 'function', `${name}.utils.${key}`);
             }

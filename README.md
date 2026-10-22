@@ -149,7 +149,7 @@ player.parseLyric(text);        // { ti, ar, al, by, offset, ms: [{ t, c }] }
 player.calcTimeStr(610);        // { h: '00:10:10', m: '10:10' }
 player.destroy();               // unbind every listener, pause the audio, remove the DOM
 
-XqMusic.VERSION;                // '1.4.0'
+XqMusic.VERSION;                // '1.4.1'
 XqMusic.utils;                  // { escapeHtml, pad2, formatTime, parseLyric, findLyricIndex }
 ```
 

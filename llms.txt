@@ -41,7 +41,7 @@ The Vue component imports `lib/css/xqmusic.css` itself, so a bundler needs no ex
   `el` is missing, `[xqmusic-player] 找不到宿主元素: …` when the selector matches nothing, and
   `[xqmusic-player] 缺少前置依赖 $g…` when the `$g` global (xqgjs) is absent.
 - `XqMusic.VERSION: string`
-  Currently `'1.4.0'`.
+  Currently `'1.4.1'`.
 - `XqMusic.utils: { escapeHtml, pad2, formatTime, parseLyric, findLyricIndex }`
   Same functions as the ESM `xqmusic-player/utils` entry.
 - `escapeHtml(value): string`, `pad2(value): string`
@@ -50,7 +50,7 @@ The Vue component imports `lib/css/xqmusic.css` itself, so a bundler needs no ex
   LRC parser. `ms` is sorted by `t`. Empty or non-string input returns `{ ms: [] }`, never `undefined`.
 - `findLyricIndex(list, time): number`
   Binary search for the last line whose `t <= time`; `-1` when nothing matches.
-- `default export of xqmusic-player/vue`: `{ version: '1.4.0', component, install(app) }`
+- `default export of xqmusic-player/vue`: `{ version: '1.4.1', component, install(app) }`
   `install` registers the component as both `xq-music` and `xqMusic`.
 
 ### Instance methods

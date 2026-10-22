@@ -72,7 +72,7 @@ are inverted relative to their behaviour; do not use them in new code.
 ## Readable instance state
 
 `options`, `elem`, `root`, `songList`, `currentIndex`, `playStatus`, `lyricShow`, `songShow`,
-`lyricData` (`{ ti, ar, al, by, offset, ms }`), `instanceId`, `version` (`'v1.4.0'`),
+`lyricData` (`{ ti, ar, al, by, offset, ms }`), `instanceId`, `version` (`'v1.4.1'`),
 `pluginName` (`'XQMusicPlayer'`), `author`, `date`, plus cached node refs `xqAudio`, `xqSongBox`,
 `xqLyricBox`, `xqCoverImg`, `xqSongTitle`, `xqCurrentTime`, `xqProgressBar`, `xqTotal`, `xqPlay`,
 `xqPause`, `xqPrev`, `xqNext`, `xqMuted`, `xqVolumn`, `xqWord`, `xqList`, `xqTop`.
@@ -80,7 +80,7 @@ are inverted relative to their behaviour; do not use them in new code.
 ## Static members
 
 ```js
-XqMusic.VERSION;  // '1.4.0' — the instance property `version` adds the 'v' prefix
+XqMusic.VERSION;  // '1.4.1' — the instance property `version` adds the 'v' prefix
 XqMusic.utils;    // { escapeHtml, pad2, formatTime, parseLyric, findLyricIndex }
 ```
 
