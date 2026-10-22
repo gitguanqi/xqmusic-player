@@ -151,7 +151,7 @@ player.parseLyric(text);        // { ti, ar, al, by, offset, ms: [{ t, c }] }
 player.calcTimeStr(610);        // { h: '00:10:10', m: '10:10' }
 player.destroy();               // 解绑全部监听、暂停音频、移除 DOM
 
-XqMusic.VERSION;                // '1.3.0'
+XqMusic.VERSION;                // '1.4.0'
 XqMusic.utils;                  // { escapeHtml, pad2, formatTime, parseLyric, findLyricIndex }
 ```
 
@@ -169,6 +169,15 @@ XqMusic.utils;                  // { escapeHtml, pad2, formatTime, parseLyric, f
 `llms.txt` 是精简版 API 速查（入口、选项、歌曲字段、硬约束）；`skills/xqmusic-player/SKILL.md`
 是可移植的接入技能，讲入口怎么选、加载顺序以及几种会直接抛错的报错。两者都随 npm 包发布，
 由 `package.json` 的 `llms` / `agents` 字段指向。
+
+技能目录一共三份文件，按「先读哪份」排列：
+
+- `SKILL.md` — 接入流程与故障对照表，读完能直接动手。
+- `references/api.md` — 完整方法表、DOM/样式钩子、缓存与已知限制，需要改样式或调内部方法时查。
+- `agents/openai.yaml` — 技能的显示名与默认提示词，给读取技能本地配置的代理宿主用。
+
+`npm test` 里的 `test/pack.test.mjs` 会真的跑一次 `npm pack --dry-run`，确认这三份文件确实进了
+npm 包——只改白名单不算数，得打包结果里真有。
 
 ## 开发
 

@@ -1,0 +1,5 @@
+interface:
+  display_name: "xqmusic-player"
+  short_description: "Integrate this package's audio player widget safely"
+  brand_color: "#7B5CFF"
+  default_prompt: "Use $xqmusic-player to pick the UMD or Vue 3 entry for this project, load $g, Font Awesome and the stylesheet in the right order, wire the song list, and call destroy() on teardown."

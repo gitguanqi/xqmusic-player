@@ -21,6 +21,7 @@ const strip = (p) => p.replace(/^\.\//, '');
 const LLMS = strip(pkg.llms);
 const SKILL = strip(pkg.agents);
 const SKILL_DIR = path.posix.dirname(SKILL);
+const SKILL_AGENT = path.posix.join(SKILL_DIR, 'agents/openai.yaml');
 const LLMS_PATH = path.join(root, LLMS);
 const SKILL_PATH = path.join(root, SKILL);
 
@@ -55,6 +56,7 @@ describe('agent 元数据字段', () => {
         assert.ok(inFiles(SKILL), `${SKILL} 不在 files 白名单里`);
         // 技能目录整个发布，references/ 才会跟着走
         assert.ok(inFiles(SKILL_DIR + '/references/api.md'), 'references/api.md 不在 files 白名单里');
+        assert.ok(inFiles(SKILL_AGENT), 'agents/openai.yaml 不在 files 白名单里');
     });
 
     it('元数据不改变入口字段', () => {
@@ -165,9 +167,35 @@ describe('技能文件', () => {
     });
 });
 
+describe('技能内的 agent 描述文件', () => {
+    const yaml = read(SKILL_AGENT);
+
+    it('四个 interface 字段齐全', () => {
+        for (const key of ['display_name', 'short_description', 'brand_color', 'default_prompt']) {
+            assert.match(yaml, new RegExp(`^\\s{2}${key}:\\s*\\S`, 'm'), `openai.yaml 缺少 ${key}`);
+        }
+        assert.match(yaml, /^brand_color:\s*$|^\s{2}brand_color:\s*"#[0-9A-Fa-f]{3,6}"$/m, 'brand_color 必须是十六进制色值');
+    });
+
+    it('default_prompt 用 $技能名 的方式引用本技能', () => {
+        const name = path.posix.basename(SKILL_DIR);
+        assert.match(yaml, new RegExp(`\\$${name}\\b`), `default_prompt 应写成 $${name}`);
+    });
+});
+
+describe('llms.txt 的分层出口', () => {
+    const llms = read(LLMS);
+
+    it('指向随包发布的技能与详细参考', () => {
+        assert.ok(llms.includes(SKILL), 'llms.txt 没给 SKILL.md 的入口');
+        assert.ok(llms.includes(SKILL_DIR + '/references/api.md'), 'llms.txt 没给 references/api.md 的入口');
+        assert.ok(llms.includes(SKILL_AGENT), 'llms.txt 没给 agents/openai.yaml 的入口');
+    });
+});
+
 describe('编码', () => {
     it('新文件都是无 BOM 的 UTF-8', () => {
-        for (const file of [LLMS, SKILL, SKILL_DIR + '/references/api.md']) {
+        for (const file of [LLMS, SKILL, SKILL_DIR + '/references/api.md', SKILL_AGENT]) {
             const buffer = readFileSync(path.join(root, file));
             assert.notEqual(buffer[0], 0xef, `${file} 带 BOM`);
             assert.ok(!buffer.toString('utf8').includes('\uFFFD'), `${file} 含替换字符`);

@@ -3,6 +3,27 @@
 本项目的所有重要变更都记录在这里，格式参照 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.4.0] - 2026-10-22
+
+把 1.3.0 的代理元数据补齐成完整的一套：技能目录补上 agent 描述文件，`llms.txt` 补上分层出口，
+并新增「真实打包产物」的自动化校验。**运行时代码无改动**，1.3.0 的调用方式完全不变。
+
+### 新增
+
+- `skills/xqmusic-player/agents/openai.yaml`：技能的显示名、短描述、主题色与默认提示词。
+  读取技能本地配置的代理宿主（`agents/` 约定目录）因此能识别本技能，而不是只看到裸 Markdown。
+- `test/pack.test.mjs`：跑一次 `npm pack --dry-run --json`，对**真实 tarball 清单**断言——
+  `llms.txt`、`SKILL.md`、`references/api.md`、`agents/openai.yaml` 与全部运行入口都在包里，
+  `exports` 里每个具体路径都能取到，`test/` `scripts/` `docs/` 等仓库专有目录没被误打进包，
+  且 `SKILL.md` 的相对引用在包内能解析。此前只校验 `files` 数组写了什么，白名单与实际产物可能脱节。
+- `test/agent-metadata.test.mjs`：新增 openai.yaml 字段断言与「llms.txt 必须给出下一层文档入口」的断言。
+
+### 变更
+
+- `llms.txt` 新增 `## Going Deeper` 分节，指向同包内的 `SKILL.md`、`references/api.md`
+  与 `agents/openai.yaml`，并说明各自该在什么情况下读——原文读完就到底，代理无从继续。
+- `README.md` / `zh.md` 的「给 AI 代理」小节列出技能目录三份文件的分工，并说明打包校验已并入 `npm test`。
+
 ## [1.3.0] - 2026-10-22
 
 给 AI 编码代理（agent）的接入元数据，**运行时代码无改动**，1.2.1 的调用方式全部照旧。

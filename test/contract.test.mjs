@@ -62,7 +62,7 @@ describe('package.json 清单', () => {
 describe('版本号一致性', () => {
     it('源码 banner、VERSION 常量、CSS banner、Vue 插件都等于 package.json', () => {
         const version = pkg.version;
-        assert.equal(pkg.version, '1.3.0');
+        assert.equal(pkg.version, '1.4.0');
         assert.match(read('lib/js/xqmusic.js'), new RegExp(`xqmusic-player v${version.replace(/\./g, '\\.')}`));
         assert.match(read('lib/js/xqmusic.js'), new RegExp(`var VERSION = '${version.replace(/\./g, '\\.')}'`));
         assert.match(read('lib/js/xqmusic.min.js'), new RegExp(`xqmusic-player v${version.replace(/\./g, '\\.')}`));

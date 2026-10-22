@@ -149,7 +149,7 @@ player.parseLyric(text);        // { ti, ar, al, by, offset, ms: [{ t, c }] }
 player.calcTimeStr(610);        // { h: '00:10:10', m: '10:10' }
 player.destroy();               // unbind every listener, pause the audio, remove the DOM
 
-XqMusic.VERSION;                // '1.3.0'
+XqMusic.VERSION;                // '1.4.0'
 XqMusic.utils;                  // { escapeHtml, pad2, formatTime, parseLyric, findLyricIndex }
 ```
 
@@ -172,6 +172,15 @@ Notes on behaviour:
 `skills/xqmusic-player/SKILL.md` is a portable integration skill covering entry selection, load order
 and the error messages this package throws. Both ship in the npm tarball and are wired through the
 `llms` / `agents` fields of `package.json`.
+
+The skill directory holds three files, in reading order:
+
+- `SKILL.md` — integration flow plus a symptom → cause → fix table; enough to start writing code.
+- `references/api.md` — full method table, DOM/CSS hooks, cache internals, known limits.
+- `agents/openai.yaml` — display name and default prompt for agent hosts that read skill-local config.
+
+`test/pack.test.mjs` runs a real `npm pack --dry-run` during `npm test` and asserts these files are in
+the tarball, so the whitelist cannot drift away from what actually gets published.
 
 ## Development
 

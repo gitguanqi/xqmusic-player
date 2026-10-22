@@ -1,6 +1,6 @@
 {
   "name": "xqmusic-player",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "A lightweight, dependency-light music player widget for the browser (UMD + Vue 3).",
   "type": "commonjs",
   "main": "lib/js/xqmusic.js",
@@ -34,7 +34,7 @@
     "build:demo": "node scripts/build-vue-demo.mjs",
     "build:fixtures": "node scripts/build-fixtures.mjs",
     "pretest": "node scripts/build-fixtures.mjs && node scripts/build-vue-demo.mjs",
-    "test": "node --test test/unit.test.mjs test/utils-parity.test.mjs test/contract.test.mjs test/harness.test.mjs test/agent-metadata.test.mjs",
+    "test": "node --test test/unit.test.mjs test/utils-parity.test.mjs test/contract.test.mjs test/harness.test.mjs test/agent-metadata.test.mjs test/pack.test.mjs",
     "test:harness": "node scripts/dom-harness.mjs",
     "pretest:browser": "node scripts/build-fixtures.mjs && node scripts/build-vue-demo.mjs",
     "test:browser": "node scripts/serve.mjs",
